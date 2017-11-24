@@ -3,20 +3,22 @@ using System.Collections;
 
 public class ShotDistroChart : MonoBehaviour {
 
+	// Default shot object.
 	public GameObject dataPoint;
+	// For comera focus.
 	public GameObject center;
-	public GameObject maxText;
-	public GameObject mainText;
-	public GameObject midText;
-	// Light anim
+	// Light for anim.
 	public Light lt;
+	// Max angle to animate light to.
 	public float maxAngle;
 	// min/max/mean
 	int maxY;
 	int minY;
 	int avgY;
 
+	// To prevent camera from moving unitil a predetermined time.
 	private bool isCameraLocked = true;
+	public int aPredeterminedTime = 4;
 
 	// Speed of camera transition
 	float speed = .8f;
@@ -39,13 +41,12 @@ public class ShotDistroChart : MonoBehaviour {
 		}
 	}
 
-	IEnumerator addDataPoint(Vector3 location){
+	void addDataPoint(Vector3 location){
 		Instantiate(dataPoint, location, Quaternion.identity);
-		return null;
 	}
 
 	IEnumerator cameraAttitude(){
-		yield return new WaitForSeconds (4);
+		yield return new WaitForSeconds (aPredeterminedTime);
 		isCameraLocked = false;
 	}
 		
@@ -56,18 +57,6 @@ public class ShotDistroChart : MonoBehaviour {
 			}
 			Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, topPosition, speed * Time.deltaTime);
 		}
-
-		// max text
-		// min text
-		// mid text
-	
-		maxText.transform.LookAt (Camera.main.transform.position);
-		Vector3 targetPostition = new Vector3( maxText.transform.position.x, 
-			Camera.main.transform.position.y, 
-			Camera.main.transform.position.z) ;
-		maxText.transform.LookAt(targetPostition);
-		maxText.transform.Rotate(Vector3.up - new Vector3(0,180,0));
-
 	}
 
 	void LateUpdate() {
