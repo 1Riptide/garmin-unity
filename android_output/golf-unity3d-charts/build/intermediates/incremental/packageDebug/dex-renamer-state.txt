@@ -1,0 +1,7 @@
+#Fri Dec 01 11:11:10 CST 2017
+base.0=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_244fe6df2a5ad9131d7cb7c8f0e1dd042c7d70a8
+renamed.1=classes.dex
+renamed.0=classes2.dex
+file.1=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_062d6d39a6de1b8cacc621b65699bdbe374f7367/classes.dex
+base.1=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_062d6d39a6de1b8cacc621b65699bdbe374f7367
+file.0=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_244fe6df2a5ad9131d7cb7c8f0e1dd042c7d70a8/classes.dex
