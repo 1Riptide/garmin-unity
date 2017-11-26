@@ -29,6 +29,8 @@ public class ShotDistroChart : MonoBehaviour {
 	void Start () {
 		StartCoroutine (addDataPoints ());
 		StartCoroutine (cameraAttitude());
+		print ("Start - calling Android! ");
+		callToAndroid ();
 	}
 
 	IEnumerator addDataPoints(){
@@ -39,6 +41,11 @@ public class ShotDistroChart : MonoBehaviour {
 			yield return new WaitForSeconds(0);
 			addDataPoint(new Vector3(Random.Range(-8.0f, 8.0f), 0, Random.Range(-14.0f, 14.0f)));
 		}
+	}
+
+	static void callToAndroid(){
+		AndroidJavaClass pluginClass = new AndroidJavaClass("com.garmin.android.golf");
+		print("callToAndroid called() : " + pluginClass.CallStatic<string>("callFromUnity"));
 	}
 
 	void addDataPoint(Vector3 location){
