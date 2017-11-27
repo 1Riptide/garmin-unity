@@ -44,8 +44,8 @@ public class ShotDistroChart : MonoBehaviour {
 	}
 
 	static void callToAndroid(){
-		AndroidJavaClass pluginClass = new AndroidJavaClass("com.garmin.android.golf");
-		print("callToAndroid called() : " + pluginClass.CallStatic<string>("callFromUnity"));
+		AndroidJavaClass pluginClass = new AndroidJavaClass("com.garmin.android.apps.golf.ui.fragments.shottrack");
+		print("callToAndroid called() : " + pluginClass.CallStatic<string>("unityDispatcher"));
 	}
 
 	void addDataPoint(Vector3 location){
