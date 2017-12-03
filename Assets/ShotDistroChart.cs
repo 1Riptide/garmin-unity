@@ -8,50 +8,68 @@ public class ShotDistroChart : MonoBehaviour {
 	public GameObject dataPoint;
 	// For comera focus.
 	public GameObject target;
-	// Average distance marker
+
+	// chart markers for distances
+	public GameObject maxDistanceMarker;
 	public GameObject averageDistanceMarker;
-	float averageShotDistanceOnChart = 0f;
+	public GameObject minDistanceMarker;
+
+	// For animating chart markers
+	float bottomOfChartZPosition = -15f;
+	float averageShotZOnChart;
+	float longestShotZOnChart;
+	float shortestShotZOnChart;
+
 	// min/max/mean
 	int maxY;
 	int minY;
 	int avgY;
 	float transitionSpeed = .8f;
 
-	// Use this for initialization
+	// Genesis
 	void Start () {
+
+		averageShotZOnChart = bottomOfChartZPosition;
+		longestShotZOnChart = bottomOfChartZPosition;
+		shortestShotZOnChart = bottomOfChartZPosition;
 		StartCoroutine (addDataPoints ());
 		callToAndroid ();
 	}
 
+	// Looper - runs (n)times a second depending on framerate.
 	void Update () {
-		Vector3 averageShotVector = new Vector3(0,0, averageShotDistanceOnChart);
+		//Animate chart markers
+		Vector3 longestShotVector = new Vector3(0,0, longestShotZOnChart);
+		Vector3 averageShotVector = new Vector3(0,0, averageShotZOnChart);
+		Vector3 shortestShotVector = new Vector3(0,0, shortestShotZOnChart);
 		averageDistanceMarker.transform.position = Vector3.Lerp (averageDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);	
+		minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
+		maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
+
 	}
 
 	IEnumerator addDataPoints(){
 		int shotCount = 150;
-		float longestShot = 0f;
-		float shortestShot = 0f;
 		float[] shotDistanceLog = new float[shotCount];
 		// Since we are plotting shots in 2D space (on a plane), we dont need to keep calculating in loop below.
 		float verticalPosition = 0f;
 		// Plot the shots.
 		for (int i = 0; i < shotCount; i++) {
-			// x range (lateral position) is 9 thru -9
-			// z range (distance) is 14 thru -14
-			yield return new WaitForSeconds(0);
 			float lateralPosition = UnityEngine.Random.Range (-9.0f, 9.0f);
 			float distance = UnityEngine.Random.Range (-14.0f, 14.0f);
 			shotDistanceLog [i] = distance;
-			longestShot = distance > longestShot ? distance : longestShot;
-			shortestShot = distance < shortestShot ? distance : shortestShot;
+			// continually calculate these values(for animation).
+			averageShotZOnChart = GetMedian (shotDistanceLog);
+			longestShotZOnChart = distance > longestShotZOnChart ? distance : longestShotZOnChart;
+			if (i == 0) {
+				shortestShotZOnChart = distance;
+			} else {
+				shortestShotZOnChart = distance < shortestShotZOnChart ? distance : shortestShotZOnChart;
+			}
 			addDataPoint(new Vector3(lateralPosition, verticalPosition, distance));
-
-			// continually calcualate average (for animation).
-			averageShotDistanceOnChart = GetMedian (shotDistanceLog);
+			// Stall the loop for aesthetics as shots drop.
+			yield return new WaitForSeconds(0);
 		}
-		print ("Longest shot =  " + longestShot);
-		print ("Shortest shot = " + shortestShot);
 	}
 
 	static float GetMedian(float[] sourceNumbers) {
@@ -72,7 +90,6 @@ public class ShotDistroChart : MonoBehaviour {
 
 	static void callToAndroid(){
 		AndroidJavaClass pluginClass = new AndroidJavaClass("com.garmin.android.apps.golf.ui.fragments.shottrack.ShotTrackFragment");
-		//print("callToAndroid called() : " + pluginClass.CallStatic<string>("callFromUnity"));
 	}
 
 	void addDataPoint(Vector3 location){
