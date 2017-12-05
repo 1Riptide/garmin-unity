@@ -33,7 +33,8 @@ public class ShotDistroChart : MonoBehaviour {
 		longestShotZOnChart = bottomOfChartZPosition;
 		shortestShotZOnChart = bottomOfChartZPosition;
 		StartCoroutine (addDataPoints ());
-		callToAndroid ();
+		// This is intended as a test to call a platform level dialog on either Android or Web.
+		ShowPlatformDialog("Hello from Unity!");
 	}
 
 	// Looper - runs (n)times a second depending on framerate.
@@ -49,7 +50,7 @@ public class ShotDistroChart : MonoBehaviour {
 	}
 
 	IEnumerator addDataPoints(){
-		int shotCount = 150;
+		int shotCount = 87;
 		float[] shotDistanceLog = new float[shotCount];
 		// Since we are plotting shots in 2D space (on a plane), we dont need to keep calculating in loop below.
 		float verticalPosition = 0f;
@@ -72,6 +73,10 @@ public class ShotDistroChart : MonoBehaviour {
 		}
 	}
 
+	void addDataPoint(Vector3 location){
+		Instantiate(dataPoint, location, Quaternion.identity);
+	}
+
 	static float GetMedian(float[] sourceNumbers) {
 		//Framework 2.0 version of this method. there is an easier way in F4        
 		if (sourceNumbers == null || sourceNumbers.Length == 0)
@@ -88,11 +93,53 @@ public class ShotDistroChart : MonoBehaviour {
 		return median;
 	}
 
-	static void callToAndroid(){
-		AndroidJavaClass pluginClass = new AndroidJavaClass("com.garmin.android.apps.golf.ui.fragments.shottrack.ShotTrackFragment");
+	#if UNITY_ANDROID
+	private AndroidJavaObject javaObj = null;
+	private AndroidJavaObject GetJavaObject() {
+		if (javaObj == null) {
+			javaObj = new AndroidJavaObject("com.garmin.android.apps.golf.ui.fragments.shottrack.ShotTrackFragment");
+		}
+		return javaObj;
 	}
 
-	void addDataPoint(Vector3 location){
-		Instantiate(dataPoint, location, Quaternion.identity);
+
+	private void ShowPlatformDialog(string message) {
+		GetJavaObject().Call("unityToastTest", message);
+		Debug.Log ("ShowPlatformDialog() : For Android - called.");
+	}
+	#else
+	// Web Impl
+	private void ShowPlatformDialog(string message) {
+		//Show an alert on web platform?
+		Debug.Log ("ShowPlatformDialog() : For Web - called.");
+	}
+	#endif
+
+	// Called from hosting Platform (Android/Web/Etc). Method by name "methodName" will be called in Unity.
+	public void externalCallDispatcher(String args){
+
+		char[] splitOn = { '|' };
+		String[] strArr = args.Split (splitOn);
+		String methodName = strArr [0];
+		// Use raw args if no delimiter was provided.
+		if (methodName == null)
+			methodName = args;
+		
+		if (methodName != null) {
+			switch (methodName) {
+			case "ToggleCamera":
+				Debug.Log ("externalCallDispatcher() : calling ToggleCamera");
+				Camera cam = Camera.main;
+				CameraTouchControl script = cam.GetComponent<CameraTouchControl>();
+				// Force ToggleCameraAngle
+				script.ToggleCameraAngle (true);
+				break;
+			default :
+				Debug.Log ("externalCallDispatcher() : I hear ya! methodName not found! = " + methodName + " args = " + args);
+				break;
+			}
+		} else {
+			Debug.Log ("externalCallDispatcher() : I hear ya! methodName is null! Stopping.  args = " + args);
+		}
 	}
 }

@@ -1,4 +1,4 @@
-#Fri Dec 01 11:11:10 CST 2017
+#Mon Dec 04 10:17:19 CST 2017
 base.0=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_244fe6df2a5ad9131d7cb7c8f0e1dd042c7d70a8
 renamed.1=classes.dex
 renamed.0=classes2.dex

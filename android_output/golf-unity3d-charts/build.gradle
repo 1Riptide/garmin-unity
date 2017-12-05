@@ -16,7 +16,7 @@ allprojects {
    }
 }
 
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 dependencies {
 	compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -28,7 +28,7 @@ android {
 
 	defaultConfig {
 		targetSdkVersion 26
-		applicationId 'com.garmin.android.apps.golf'
+		//applicationId 'com.garmin.android.apps.golf'
 	}
 
 	lintOptions {

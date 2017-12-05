@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Fri Dec 01 11:11:10 CST 2017
+#Mon Dec 04 10:17:21 CST 2017
 5.base=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/assets/debug
 42.base=/Users/stalnakerc/Projects/Unity3D/golf/garmin-unity/android_output/golf-unity3d-charts/build/intermediates/assets/debug
 32.set=ASSET
