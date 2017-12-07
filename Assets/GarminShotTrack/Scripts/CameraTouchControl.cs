@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class CameraTouchControl : MonoBehaviour
 {
-	public GameObject target;
-	public Transform cameraRotationDefault;
-	public Transform cameraRotationLookingDown;
-	public float cameraTransitionSpeed;
-
 	private Camera cam;
 	private Vector3 lastPanPosition;
-	private int panFingerId; // Touch mode only
 	private bool wasZoomingLastFrame; // Touch mode only
 	private Vector2[] lastZoomPositions; // Touch mode only
 	private static readonly float PanSpeed = 20f;
@@ -20,47 +17,31 @@ public class CameraTouchControl : MonoBehaviour
 	private static readonly float[] positionBoundsY = new float[]{28f, 28f};
 	private static readonly float[] ZoomBounds = new float[]{10f, 80f};
 
-	// Used to determine if we are looking straight down at the chart, or from an angle.
-	bool isCameraToggledDown = false;
 	// For counting taps OR clicks.
 	int inputCount = 0; 
 	// Camera position when looking down at chart.
-	Vector3 cameraTopPosition = new Vector3(0,28,0);
+	public Vector3 cameraTopPosition = new Vector3(0,28,0);
 	// Obtained at runtime.
-	Vector3 cameraDefaultPosition; 
+	public Vector3 cameraDefaultPosition; 
 	// Speed of camera transition
-	float cameraDoubleTapTransitionSpeed =1.5f;
-	// Time to compare DeltaTime with.
-	float elapsedTime = 0;
-	// A raycasting point used for camera targeting.
-	Vector3 lookAtMe;
-	bool isPannable = false;
-
-	bool singleClick;
+	public float cameraDoubleTapTransitionSpeed =1.5f;
+	public bool singleClick;
 	float doubleClickTimeBasis = 0;
+	// How long is considered a double click/touch
 	float doubleClickThreshold = .35f;
 
+	CameraSceneControl sceneController;
 	void Awake() {
 		cam = GetComponent<Camera>();
 		cameraDefaultPosition = cam.transform.position;
+		sceneController = GetComponent<CameraSceneControl>();
 	}
 
 	void Update() {		
 		if (Input.touchSupported && Application.platform != RuntimePlatform.WebGLPlayer) {
-			HandleTouch();
+			HandleTouch ();
 		} else {
 			HandleMouse();
-		}
-		if (!isCameraToggledDown) {
-			if (!singleClick) {
-				Camera.main.transform.rotation = Quaternion.Lerp(Camera.main.transform.rotation, cameraRotationDefault.rotation,  cameraDoubleTapTransitionSpeed * Time.deltaTime);
-				Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, cameraDefaultPosition, cameraDoubleTapTransitionSpeed * Time.deltaTime);
-			} 
-		} else {
-			if (!singleClick) {
-				Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, cameraRotationLookingDown.rotation, cameraDoubleTapTransitionSpeed * Time.deltaTime);
-				Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, cameraTopPosition, cameraDoubleTapTransitionSpeed * Time.deltaTime);
-			}
 		}
 	}
 
@@ -69,7 +50,7 @@ public class CameraTouchControl : MonoBehaviour
 		case 1: 
 			// If the touch began, capture its position and its finger ID. Otherwise, if the finger ID of the touch doesn't match, skip it.
 			Touch touch = Input.GetTouch (0);
-			if (touch.fingerId == panFingerId && touch.phase == TouchPhase.Moved) {
+			if (touch.phase == TouchPhase.Moved) {
 				PanCamera (touch.position);
 			} else if (touch.phase == TouchPhase.Began) {
 				if (doubleClickTimeBasis == 0) {
@@ -78,11 +59,11 @@ public class CameraTouchControl : MonoBehaviour
 				} else {
 					// Last known state was singleClick - and another click came is recorded. Test:
 					if ((Time.time - doubleClickTimeBasis) > doubleClickThreshold) {
-						lastPanPosition = Input.mousePosition;
 						singleClick = true;
+						lastPanPosition = Input.mousePosition;
 					} else {
-						ToggleCameraAngle ();
 						singleClick = false;
+						sceneController.ToggleCameraAngle ();
 					}
 				} 
 				doubleClickTimeBasis = Time.time;
@@ -124,7 +105,7 @@ public class CameraTouchControl : MonoBehaviour
 					lastPanPosition = Input.mousePosition;
 					singleClick = true;
 				} else {
-					ToggleCameraAngle ();
+					sceneController.ToggleCameraAngle ();
 					singleClick = false;
 				}
 			} 
@@ -158,15 +139,5 @@ public class CameraTouchControl : MonoBehaviour
 			return;
 		}
 		cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - (offset * speed), ZoomBounds[0], ZoomBounds[1]);
-	}
-
-	public void ToggleCameraAngle(){
-		isCameraToggledDown = !isCameraToggledDown;
-	}
-
-	// Force singleclick by calling with signature.
-	public void ToggleCameraAngle(bool force){
-		singleClick = false;
-		isCameraToggledDown = !isCameraToggledDown;
 	}
 }

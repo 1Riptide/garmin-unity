@@ -31,21 +31,10 @@ public class ShotDistroChart : MonoBehaviour {
 	float transitionSpeed = .8f;
 
 	// When GameObject is out of view, disable and stop all Looping behavior
-	bool isEnabled =  true;
+	public bool isEnabled =  true;
 
 	// Genesis
 	void Start () {
-		//InvokeRepeating ("TimedDemo", .1f, 30f);	
-		/*
-		while(true)
-		{
-			String testJSONData = "{\n  \"numberOfRounds\": 1,\n  \"percentFairwayLeft\": 0,\n  \"percentFairwayRight\": 0,\n  \"percentFairwayHit\": 0,\n  \"minShotDistance\": 0,\n  \"maxShotDistance\": 113.56,\n  \"avgShotDistance\": 0,\n  \"minDispersionDistance\": 0,\n  \"maxDispersionDistance\": 0,\n  \"shotDispersionDetails\": [\n    {\n      \"shotId\": 1,\n      \"scorecardId\": 1122,\n      \"holeNumber\": 2,\n      \"shotTime\": \"2017-12-05\",\n      \"clubId\": 0,\n      \"dispersionDistance\": 21.3,\n      \"shotDistance\": 113.56,\n      \"fairwayShotOutcome\": \"LEFT\"\n    }\n  ]\n}";
-			//Initialize (testJSONData);
-			Initialize("");
-			yield return new WaitForSeconds(8);
-			yield return new WaitForEndOfFrame();
-		}
-		*/
 		Initialize("");
 	}
 
@@ -64,21 +53,7 @@ public class ShotDistroChart : MonoBehaviour {
 			}
 		}
 	}
-
-	/*
-	void TimedDemo(){
-		Debug.Log ("TimedDemo");
-		while (isEnabled) {
-			String testJSONData = "{\n  \"numberOfRounds\": 1,\n  \"percentFairwayLeft\": 0,\n  \"percentFairwayRight\": 0,\n  \"percentFairwayHit\": 0,\n  \"minShotDistance\": 0,\n  \"maxShotDistance\": 113.56,\n  \"avgShotDistance\": 0,\n  \"minDispersionDistance\": 0,\n  \"maxDispersionDistance\": 0,\n  \"shotDispersionDetails\": [\n    {\n      \"shotId\": 1,\n      \"scorecardId\": 1122,\n      \"holeNumber\": 2,\n      \"shotTime\": \"2017-12-05\",\n      \"clubId\": 0,\n      \"dispersionDistance\": 21.3,\n      \"shotDistance\": 113.56,\n      \"fairwayShotOutcome\": \"LEFT\"\n    }\n  ]\n}";
-			//Initialize (testJSONData);
-			Initialize(testJSONData);
-		}
-
-		yield return new WaitForSeconds (5);
-	} 
-	*/
-
-
+		
 	IEnumerator AddDataPoints(){
 		Debug.Log ("AddDataPoints no args");
 		int shotCount = 87;
@@ -179,34 +154,6 @@ public class ShotDistroChart : MonoBehaviour {
 		Debug.Log ("ShowPlatformDialog() : For Web - called.");
 	}
 	#endif
-
-	// Called from hosting Platform (Android/Web/Etc). Method by name "methodName" will be called in Unity.
-	public void externalCallDispatcher(String args){
-
-		char[] splitOn = { '|' };
-		String[] strArr = args.Split (splitOn);
-		String methodName = strArr [0];
-		// Use raw args if no delimiter was provided.
-		if (methodName == null)
-			methodName = args;
-		
-		if (methodName != null) {
-			switch (methodName) {
-			case "ToggleCamera":
-				Debug.Log ("externalCallDispatcher() : calling ToggleCamera");
-				Camera cam = Camera.main;
-				CameraTouchControl script = cam.GetComponent<CameraTouchControl>();
-				// Force ToggleCameraAngle
-				script.ToggleCameraAngle (true);
-				break;
-			default :
-				Debug.Log ("externalCallDispatcher() : I hear ya! methodName not found! = " + methodName + " args = " + args);
-				break;
-			}
-		} else {
-			Debug.Log ("externalCallDispatcher() : I hear ya! methodName is null! Stopping.  args = " + args);
-		}
-	}
 
 	void Cleanup(){
 		averageShotZOnChart = bottomOfChartZPosition;
