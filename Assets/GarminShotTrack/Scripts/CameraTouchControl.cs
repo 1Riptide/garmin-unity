@@ -22,26 +22,30 @@ public class CameraTouchControl : MonoBehaviour
 	// Camera position when looking down at chart.
 	public Vector3 cameraTopPosition = new Vector3(0,28,0);
 	// Obtained at runtime.
-	public Vector3 cameraDefaultPosition; 
+	//public Vector3 cameraDefaultPosition; 
 	// Speed of camera transition
 	public float cameraDoubleTapTransitionSpeed =1.5f;
 	public bool singleClick;
 	float doubleClickTimeBasis = 0;
 	// How long is considered a double click/touch
 	float doubleClickThreshold = .35f;
+	float defaultFOV;
 
 	CameraSceneControl sceneController;
+
 	void Awake() {
 		cam = GetComponent<Camera>();
-		cameraDefaultPosition = cam.transform.position;
+		defaultFOV = cam.fieldOfView;
 		sceneController = GetComponent<CameraSceneControl>();
 	}
 
-	void Update() {		
-		if (Input.touchSupported && Application.platform != RuntimePlatform.WebGLPlayer) {
-			HandleTouch ();
-		} else {
-			HandleMouse();
+	void Update() {
+		if (sceneController.defaultScene.Equals (sceneController.driveScene)) {
+			if (Input.touchSupported && Application.platform != RuntimePlatform.WebGLPlayer) {
+				HandleTouch ();
+			} else {
+				HandleMouse ();
+			}
 		}
 	}
 
@@ -139,5 +143,9 @@ public class CameraTouchControl : MonoBehaviour
 			return;
 		}
 		cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - (offset * speed), ZoomBounds[0], ZoomBounds[1]);
+	}
+
+	public void SceneChanged(){
+		cam.fieldOfView = defaultFOV;
 	}
 }

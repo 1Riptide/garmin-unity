@@ -8,12 +8,11 @@ public class CameraSceneControl : MonoBehaviour {
 
 	public Transform cameraRotationLookingDown;
 	public float cameraTransitionSpeed;
-	public GameObject dispersionScene;
+	public GameObject driveScene;
 	public GameObject approachScene;
 	public GameObject chippingScene;
 	public GameObject puttingScene;
 	public GameObject defaultScene;
-	SceneName currentSceneName;
 	// Used to determine if we are looking straight down at the chart, or from an angle.
 	public static bool isCameraToggledDown = false;
 
@@ -23,11 +22,20 @@ public class CameraSceneControl : MonoBehaviour {
 	void Awake() {
 		touchController = GetComponent<CameraTouchControl>();
 	}
+
+	void Start(){
+		//ChangeScene ("PUTTING");
+		if (defaultScene != null) {
+			Transform target = defaultScene.transform.Find ("CameraTarget");
+			Camera.main.transform.rotation = target.rotation;
+			Camera.main.transform.position = target.position;
+		}
+	}
 		
 	// Update is called once per frame
 	void Update () {
 		Transform target = defaultScene.transform.Find ("CameraTarget");
-		if (!isTransitioning && defaultScene.Equals (dispersionScene)) {
+		if (!isTransitioning && defaultScene.Equals (driveScene)) {		
 			if (!isCameraToggledDown) {
 				if (!touchController.singleClick) {
 					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
@@ -40,9 +48,10 @@ public class CameraSceneControl : MonoBehaviour {
 				}
 			}
 		} else {
-			Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed );
-			Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed );
-			if (Camera.main.transform.position == target.position) {
+			if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation  ) {
+				Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed);
+				Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed);
+			} else {
 				isTransitioning = false;
 			}
 		}
@@ -52,23 +61,28 @@ public class CameraSceneControl : MonoBehaviour {
 		Debug.Log ("ChangeScene() called in Unity! sceneName = " + sceneName);
 		SceneName newSceneName = (SceneName) System.Enum.Parse( typeof( SceneName ), sceneName );
 		isTransitioning = true;
+		touchController.SceneChanged ();
 		//defaultScene.isEnabled = false;
 		if (newSceneName != null) {
-			currentSceneName = newSceneName;
+			
 			switch (newSceneName) {
 			case SceneName.APPROACH:
+				isCameraToggledDown = true;
 				defaultScene = approachScene;
 				break;
 			case SceneName.CHIPPING:
+				isCameraToggledDown = true;
 				defaultScene = chippingScene;
 				break;
 			case SceneName.PUTTING:
+				isCameraToggledDown = true;
 				defaultScene = puttingScene;
 				break;
 			// fallthrough is intentional
 			case SceneName.DRIVE:
 			default :
-				defaultScene = dispersionScene;
+				isCameraToggledDown = false;
+				defaultScene = driveScene;
 				break;
 			}
 		}
@@ -77,10 +91,4 @@ public class CameraSceneControl : MonoBehaviour {
 	public void ToggleCameraAngle(){
 		isCameraToggledDown = !isCameraToggledDown;
 	}
-
-	// Force singleclick by calling with signature.
-	public void ToggleCameraAngle(bool force){
-		isCameraToggledDown = !isCameraToggledDown;
-	}
-
 }

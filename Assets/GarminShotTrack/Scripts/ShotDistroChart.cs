@@ -35,6 +35,7 @@ public class ShotDistroChart : MonoBehaviour {
 
 	// Genesis
 	void Start () {
+		// This must be called by external platform. Pass JSON.
 		Initialize("");
 	}
 
