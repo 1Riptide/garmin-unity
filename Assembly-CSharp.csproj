@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\ApproachChart.cs" />
      <Compile Include="Assets\epyphany\demo\ressources\move.cs" />
      <Compile Include="Assets\epyphany\demo\ressources\rotate.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\CameraSceneControl.cs" />
