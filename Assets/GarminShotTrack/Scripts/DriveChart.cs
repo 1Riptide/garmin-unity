@@ -3,13 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class ShotDistroChart : MonoBehaviour {
+public class DriveChart : MonoBehaviour {
 
 	// Default shot object.
 	public GameObject dataPoint;
 	public static Stack<GameObject> dataPoints = new Stack<GameObject>();
-	// For comera focus.
-	public GameObject target;
 	// chart markers for distances
 	public GameObject maxDistanceMarker;
 	public GameObject averageDistanceMarker;
@@ -86,7 +84,7 @@ public class ShotDistroChart : MonoBehaviour {
 		}
 	}
 
-	IEnumerator AddDataPoints(ShotDispersionData dispersionData){
+	IEnumerator AddDataPoints(ClubTrackDriveDataDTO dispersionData){
 		var shotCount = dispersionData.shotDispersionDetails.Length;
 		Debug.Log ("AddDataPoints shotCount = " + shotCount);
 		float[] shotDistanceLog = new float[shotCount];
@@ -190,7 +188,7 @@ public class ShotDistroChart : MonoBehaviour {
 		} else {
 			Debug.Log ("Initialize() json is not null. Casting to JSON obj...");
 			try{
-				ShotDispersionData dispersionData = ShotDispersionData.CreateFromJSON (json);
+				ClubTrackDriveDataDTO dispersionData = ClubTrackDriveDataDTO.CreateFromJSON (json);
 				Debug.Log ("Initialize() created " + dispersionData.shotDispersionDetails);
 				if (dispersionData != null && dispersionData.shotDispersionDetails != null) {
 					StartCoroutine (AddDataPoints (dispersionData));

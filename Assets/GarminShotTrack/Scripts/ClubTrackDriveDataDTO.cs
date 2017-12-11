@@ -27,7 +27,7 @@ using System.Collections;
 }
 */
 [System.Serializable]
-public class ShotDispersionData
+public class ClubTrackDriveDataDTO
 {
 	public int numberOfRounds;
 	public float percentFairwayLeft { get; set;}
@@ -40,9 +40,9 @@ public class ShotDispersionData
 	public float maxDispersionDistance { get; set;}
 	public ShotDispersionDetails[] shotDispersionDetails;
 
-	public static ShotDispersionData CreateFromJSON(string jsonString)
+	public static ClubTrackDriveDataDTO CreateFromJSON(string jsonString)
 	{
-		return JsonUtility.FromJson<ShotDispersionData>(jsonString);
+		return JsonUtility.FromJson<ClubTrackDriveDataDTO>(jsonString);
 	}
 }
 

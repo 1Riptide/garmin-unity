@@ -6,7 +6,6 @@ public class CameraSceneControl : MonoBehaviour {
 
 	enum SceneName {DRIVE, APPROACH, CHIPPING, PUTTING};
 
-	public Transform cameraRotationLookingDown;
 	public float cameraTransitionSpeed;
 	public GameObject driveScene;
 	public GameObject approachScene;
@@ -17,7 +16,7 @@ public class CameraSceneControl : MonoBehaviour {
 	public static bool isCameraToggledDown = false;
 
 	CameraTouchControl touchController;
-	bool isTransitioning = false;
+	public bool isTransitioning = false;
 
 	void Awake() {
 		touchController = GetComponent<CameraTouchControl>();
@@ -43,16 +42,19 @@ public class CameraSceneControl : MonoBehaviour {
 				} 
 			} else {
 				if (!touchController.singleClick) {
-					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, cameraRotationLookingDown.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
-					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, cameraRotationLookingDown.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+					Transform topDownTarget = defaultScene.transform.Find ("CameraTargetTopDown");
+					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, topDownTarget.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, topDownTarget.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
 				}
 			}
 		} else {
-			if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation  ) {
-				Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed);
-				Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed);
-			} else {
-				isTransitioning = false;
+			if (isTransitioning) {
+				if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation) {
+					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed);
+					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed);
+				} else {
+					isTransitioning = false;
+				}
 			}
 		}
 	}

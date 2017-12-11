@@ -56,9 +56,9 @@
      <Compile Include="Assets\GarminShotTrack\Scripts\CameraSceneControl.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\CameraTouchControl.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\ChartTextBehavior.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\ClubTrackDriveDataDTO.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\DriveChart.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\GolfBall.cs" />
-     <Compile Include="Assets\GarminShotTrack\Scripts\ShotDispersionData.cs" />
-     <Compile Include="Assets\GarminShotTrack\Scripts\ShotDistroChart.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\MenuSceneLoader.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\PauseMenu.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\SceneAndURLLoader.cs" />
