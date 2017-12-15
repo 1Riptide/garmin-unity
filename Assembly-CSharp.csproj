@@ -60,6 +60,8 @@
      <Compile Include="Assets\GarminShotTrack\Scripts\ClubTrackDriveDataDTO.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\DriveChart.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\GolfBall.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\IGarmin3DChart.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\JsonHelper.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\MenuSceneLoader.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\PauseMenu.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\SceneAndURLLoader.cs" />
@@ -70,6 +72,8 @@
      <Compile Include="Assets\SampleScenes\Scripts\SlowMoButton.cs" />
      <Compile Include="Assets\Scripts\Procedural\ProceduralCylinder.cs" />
      <Compile Include="Assets\Scripts\Procedural\ProceduralPlane.cs" />
+     <Compile Include="Assets\SimpleJSON.cs" />
+     <Compile Include="Assets\SimpleJSONUnity.cs" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderRGB.shader" />

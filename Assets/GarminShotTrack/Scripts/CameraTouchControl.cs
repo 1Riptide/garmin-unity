@@ -40,7 +40,7 @@ public class CameraTouchControl : MonoBehaviour
 	}
 
 	void Update() {
-		if (sceneController.defaultScene.Equals (sceneController.driveScene)) {
+		if (sceneController.defaultScene != null && sceneController.defaultScene.Equals (sceneController.driveScene)) {
 			if (Input.touchSupported && Application.platform != RuntimePlatform.WebGLPlayer) {
 				HandleTouch ();
 			} else {

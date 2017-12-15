@@ -38,7 +38,7 @@ public class ClubTrackDriveDataDTO
 	public float avgShotDistance { get; set;}
 	public float minDispersionDistance { get; set;}
 	public float maxDispersionDistance { get; set;}
-	public ShotDispersionDetails[] shotDispersionDetails;
+	public ShotDispersionDetail[] shotDispersionDetails;
 
 	public static ClubTrackDriveDataDTO CreateFromJSON(string jsonString)
 	{
@@ -47,7 +47,7 @@ public class ClubTrackDriveDataDTO
 }
 
 [System.Serializable]
-public class ShotDispersionDetails
+public class ShotDispersionDetail
 {
 	public int shotId { get; set;}
 	public int scorecardId { get; set;}
@@ -57,4 +57,8 @@ public class ShotDispersionDetails
 	public float dispersionDistance { get; set;}
 	public float shotDistance { get; set;}
 	public string fairwayShotOutcome { get; set;}
+	public static ShotDispersionDetail CreateFromJSON(string jsonString)
+	{
+		return JsonUtility.FromJson<ShotDispersionDetail>(jsonString);
+	}
 }

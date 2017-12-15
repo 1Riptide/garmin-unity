@@ -19,54 +19,62 @@ public class CameraSceneControl : MonoBehaviour {
 	public bool isTransitioning = false;
 
 	void Awake() {
-		touchController = GetComponent<CameraTouchControl>();
-	}
-
-	void Start(){
-		//ChangeScene ("PUTTING");
-		if (defaultScene != null) {
-			Transform target = defaultScene.transform.Find ("CameraTarget");
-			Camera.main.transform.rotation = target.rotation;
-			Camera.main.transform.position = target.position;
-		}
+		touchController = GetComponent<CameraTouchControl> ();
 	}
 		
+	void Start(){
+		#if UNITY_ANDROID
+		Debug.Log ("SignalReady() : sent to Android.");
+		AndroidJavaObject javaObj = new AndroidJavaObject("com.garmin.android.apps.golf.ui.fragments.clubtrack.ClubTrackFragment");
+		javaObj.Call("signalReady", "");
+		#endif
+		// Default
+		ChangeScene (SceneName.DRIVE.ToString());
+	}
+
 	// Update is called once per frame
 	void Update () {
-		Transform target = defaultScene.transform.Find ("CameraTarget");
-		if (!isTransitioning && defaultScene.Equals (driveScene)) {		
-			if (!isCameraToggledDown) {
-				if (!touchController.singleClick) {
-					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
-					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
-				} 
-			} else {
-				if (!touchController.singleClick) {
-					Transform topDownTarget = defaultScene.transform.Find ("CameraTargetTopDown");
-					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, topDownTarget.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
-					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, topDownTarget.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+		if (defaultScene != null) {
+			Transform target = defaultScene.transform.Find ("CameraTarget");
+			if (!isTransitioning && defaultScene.Equals (driveScene)) {		
+				if (!isCameraToggledDown) {
+					if (!touchController.singleClick) {
+						Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+						Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+					} 
+				} else {
+					if (!touchController.singleClick) {
+						Transform topDownTarget = defaultScene.transform.Find ("CameraTargetTopDown");
+						Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, topDownTarget.rotation, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+						Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, topDownTarget.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
+					}
 				}
+			} else {
+				if (isTransitioning) {
+					if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation) {
+						Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed);
+						Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed);
+					} else {
+						isTransitioning = false;
+					}
+				} 
 			}
 		} else {
-			if (isTransitioning) {
-				if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation) {
-					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed);
-					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed);
-				} else {
-					isTransitioning = false;
-				}
-			}
+			// No default scene. Sleeping....
 		}
 	}
 
 	public void ChangeScene(string sceneName){
 		Debug.Log ("ChangeScene() called in Unity! sceneName = " + sceneName);
+		if (defaultScene != null) {
+			IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
+			if (chartInterface != null) {
+				chartInterface.isEnabled = false;
+			}
+		}
 		SceneName newSceneName = (SceneName) System.Enum.Parse( typeof( SceneName ), sceneName );
 		isTransitioning = true;
-		touchController.SceneChanged ();
-		//defaultScene.isEnabled = false;
 		if (newSceneName != null) {
-			
 			switch (newSceneName) {
 			case SceneName.APPROACH:
 				isCameraToggledDown = true;
@@ -87,10 +95,39 @@ public class CameraSceneControl : MonoBehaviour {
 				defaultScene = driveScene;
 				break;
 			}
+
+			// Enable Scene
+			if (defaultScene != null) {
+				IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
+				chartInterface.isEnabled = true;
+				touchController.SceneChanged ();
+			} else {
+				Debug.Log ("ChangeScene : could not find scene " + newSceneName);
+			}
 		}
 	}
 
 	public void ToggleCameraAngle(){
 		isCameraToggledDown = !isCameraToggledDown;
 	}
+
+	/*
+	void FixedUpdate(){
+		
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+		{ 
+			#if UNITY_ANDROID
+			// Get the unity player activity
+			AndroidJavaObject activity = 
+				new AndroidJavaClass("com.unity3d.player.UnityPlayer")
+					.GetStatic<AndroidJavaObject>("currentActivity");
+
+			// call activity's boolean moveTaskToBack(boolean nonRoot) function
+			// documentation: http://developer.android.com/reference/android/app/Activity.html#moveTaskToBack(boolean)
+			activity.Call<bool>("moveTaskToBack", true);
+
+			#endif
+		}
+	}
+	*/
 }

@@ -2,6 +2,7 @@
 buildscript {
 	repositories {
 		jcenter()
+       	 	mavenCentral()
 	}
 
 	dependencies {
@@ -55,5 +56,7 @@ android {
   			**SIGNCONFIG**
   		}
 	}
+
+	packageBuildConfig = false
 
 }
