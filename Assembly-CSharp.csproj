@@ -51,17 +51,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ApproachChart.cs" />
      <Compile Include="Assets\epyphany\demo\ressources\move.cs" />
      <Compile Include="Assets\epyphany\demo\ressources\rotate.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\ApproachChart.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\CameraSceneControl.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\CameraTouchControl.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\ChartTextBehavior.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\ChippingChart.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\ClubTrackDriveDataDTO.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\DriveChart.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\GolfBall.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\IGarmin3DChart.cs" />
      <Compile Include="Assets\GarminShotTrack\Scripts\JsonHelper.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\PuttingChart.cs" />
+     <Compile Include="Assets\GarminShotTrack\Scripts\ScaleRelativeToCamera.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\MenuSceneLoader.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\PauseMenu.cs" />
      <Compile Include="Assets\SampleScenes\Menu\Scripts\SceneAndURLLoader.cs" />

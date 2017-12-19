@@ -168,7 +168,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 						minShotDistanceOnChart = (int)distance;
 					}
 
-
 					// Bottom(min) to Top(max)
 					float offsetDistance = distance + negativeZOffset;
 					float distanceRatio = offsetDistance / (maxDistance + negativeZOffset);
