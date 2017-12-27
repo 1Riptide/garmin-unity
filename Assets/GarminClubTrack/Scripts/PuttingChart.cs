@@ -7,10 +7,21 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 	public static Stack<GameObject> dataPoints = new Stack<GameObject>();
 	private bool isInitialized = false;
 	public GameObject puttsOverlay;
+	// only used for testing.
+	public GameObject mockUIOverlay;
 	GameObject animatedBackground;
 	Animator anim;
 	public bool isEnabled {get; set;}
-	// Use this for initialization
+
+	void Awake () {
+		// Attn web team. You might wanna hide this too!
+		#if UNITY_ANDROID
+		if(mockUIOverlay != null){
+			mockUIOverlay.SetActive(false);
+		}
+		#endif
+	}
+
 	void Start () {
 		puttsOverlay.SetActive(isInitialized);
 		animatedBackground = GameObject.Find ("Background");

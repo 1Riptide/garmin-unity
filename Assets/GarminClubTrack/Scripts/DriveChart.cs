@@ -51,6 +51,10 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 		maxText = (TextMesh)maxDistanceMarker.GetComponentInChildren(typeof(TextMesh))as TextMesh;
 		averageText = (TextMesh)avgDistanceMarker.GetComponentInChildren(typeof(TextMesh))as TextMesh;
 		minText = (TextMesh)minDistanceMarker.GetComponentInChildren(typeof(TextMesh))as TextMesh;
+
+	}
+
+	public void MockInitialize(){
 		// This must be called by external platform. Pass JSON.
 		Initialize(getMockJSON());
 	}
