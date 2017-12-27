@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,16 +11,26 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 	// only used for testing.
 	public GameObject mockUIOverlay;
 	GameObject animatedBackground;
+	GameObject animatedBall;
+	Vector3 animatedBallDefaultVector;
+	GameObject animatedBallShotTarget;
+	Vector3 animatedBallShotDirection;
 	Animator anim;
-	public bool isEnabled {get; set;}
+	public bool isFocused {get; set;}
 
 	void Awake () {
-		// Attn web team. You might wanna hide this too!
-		#if UNITY_ANDROID
-		if(mockUIOverlay != null){
-			mockUIOverlay.SetActive(false);
+		animatedBall = GameObject.Find ("Ball");
+		GameObject ballTarget = GameObject.Find ("BallTarget");
+
+		if (animatedBall != null) {
+			Vector3 defaultBallPosition = animatedBall.transform.position;
+			animatedBallDefaultVector = defaultBallPosition;
+			animatedBall.SetActive (false);
+			if (ballTarget != null) {
+				animatedBallShotDirection = ballTarget.transform.position - animatedBall.transform.position;
+				animatedBallShotDirection = animatedBallShotDirection.normalized;
+			}
 		}
-		#endif
 	}
 
 	void Start () {
@@ -33,9 +44,9 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 	
 	// Update is called once per frame
 	void Update () {
-		if (isEnabled && !isInitialized) {
+		if (isFocused && !isInitialized) {
 			StartCoroutine(playBackgroundTransition());
-		}else if(!isEnabled && isInitialized){
+		}else if(!isFocused && isInitialized){
 			reverseBackgroundTransition();
 		}
 	}
@@ -44,8 +55,13 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 		Debug.Log ("playBackgroundTransition()");
 		isInitialized = true;
 		anim.Play ("PlayAnimation");
-		yield return new WaitForSeconds (2f);
+		yield return new WaitForSeconds (1.9f);
 		StartCoroutine(TogglePuttsOverlay ());
+		if (animatedBall != null) {
+			animatedBall.SetActive(true);
+			animatedBall.transform.position = animatedBallDefaultVector;
+			animatedBall.transform.GetComponent<Rigidbody> ().AddForce(animatedBallShotDirection * 499f, ForceMode.Acceleration);
+		}
 	}
 
 	public void reverseBackgroundTransition(){
@@ -53,6 +69,10 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 		isInitialized = false;
 		StartCoroutine(TogglePuttsOverlay ());
 		anim.Play ("ReverseAnimation");
+		if (animatedBall != null) {
+			animatedBall.transform.position.Equals (animatedBallDefaultVector);
+			animatedBall.SetActive(false);
+		}
 	}
 
 	IEnumerator TogglePuttsOverlay()
@@ -60,5 +80,14 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 		Debug.Log ("TogglePuttsOverlay on ? " + isInitialized);
 		puttsOverlay.SetActive(isInitialized);
 		yield return null;
+	}
+
+	public void MockInitialize(){
+		// This must be called by external platform. Pass JSON.
+		//Initialize(getMockJSON());
+	}
+
+	public void Initialize(String json){
+
 	}
 }

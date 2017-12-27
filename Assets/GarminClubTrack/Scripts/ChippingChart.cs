@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,8 +8,7 @@ public class ChippingChart : MonoBehaviour, IGarmin3DChart {
 	// Default shot object.
 	public GameObject chippingDataPoint;
 	public static Stack<GameObject> dataPoints = new Stack<GameObject>();
-	private bool isInitialized = false;
-	public bool isEnabled {get; set;}
+	public bool isFocused {get; set;}
 
 	// Use this for initialization
 	void Start () {
@@ -18,5 +18,9 @@ public class ChippingChart : MonoBehaviour, IGarmin3DChart {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public void Initialize(String json){
+
 	}
 }

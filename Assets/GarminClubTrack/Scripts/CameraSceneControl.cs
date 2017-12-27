@@ -25,10 +25,6 @@ public class CameraSceneControl : MonoBehaviour {
 	}
 		
 	void Start(){
-
-		// Default
-		ChangeScene (defaultScene.name);
-
 		#if UNITY_ANDROID
 		Debug.Log ("SignalReady() : sent to Android.");
 		AndroidJavaObject javaObj = new AndroidJavaObject("com.garmin.android.apps.golf.ui.fragments.clubtrack.ClubTrackFragment");
@@ -87,7 +83,7 @@ public class CameraSceneControl : MonoBehaviour {
 		if (defaultScene != null) {
 			IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
 			if (chartInterface != null) {
-				chartInterface.isEnabled = false;
+				chartInterface.isFocused = false;
 			}
 		}
 		SceneName newSceneName = (SceneName) System.Enum.Parse( typeof( SceneName ), sceneName );
@@ -118,7 +114,7 @@ public class CameraSceneControl : MonoBehaviour {
 			// Enable Scene
 			if (defaultScene != null) {
 				IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
-				chartInterface.isEnabled = true;
+				chartInterface.isFocused = true;
 				touchController.SceneChanged ();
 				Debug.Log ("ChangeScene : found scene reseting Camera Fov  - " + newSceneName);
 			} else {

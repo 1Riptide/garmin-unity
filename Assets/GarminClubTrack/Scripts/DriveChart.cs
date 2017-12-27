@@ -6,7 +6,8 @@ using SimpleJSON;
 
 public class DriveChart : MonoBehaviour, IGarmin3DChart {
 
-	enum ShotOutcomes {HIT, LEFT, RIGHT, NO_FAIRWAY};
+	public bool isFocused {get; set;}
+	//enum ShotOutcomes {HIT, LEFT, RIGHT, NO_FAIRWAY};
 	// Default shot object.
 	public GameObject whiteDataPoint;
 	public GameObject redDataPoint;
@@ -42,16 +43,14 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 	int avgY;
 	float transitionSpeed = .8f;
 
-	private bool isInitialized = false;
-	public bool isEnabled {get; set;}
-
-
 	// Genesis
 	void Start () {
 		maxText = (TextMesh)maxDistanceMarker.GetComponentInChildren(typeof(TextMesh))as TextMesh;
 		averageText = (TextMesh)avgDistanceMarker.GetComponentInChildren(typeof(TextMesh))as TextMesh;
 		minText = (TextMesh)minDistanceMarker.GetComponentInChildren(typeof(TextMesh))as TextMesh;
-
+		maxDistanceMarker.SetActive(false);
+		minDistanceMarker.SetActive(false);
+		avgDistanceMarker.SetActive(false);
 	}
 
 	public void MockInitialize(){
@@ -61,17 +60,11 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 
 	// Looper - runs (n)times a second depending on framerate.
 	void Update () {
-		 if(isInitialized) {
-				avgDistanceMarker.transform.position = Vector3.Lerp (avgDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);	
-				minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
-				maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
-	
-		} else {
-			Debug.Log ("Update isEnabled = " + isEnabled + " isInitialized " + isInitialized);
-			maxDistanceMarker.active = false;
-			minDistanceMarker.active = false;
-			avgDistanceMarker.active = false;
-		}
+		 if(isFocused == true) {
+			avgDistanceMarker.transform.position = Vector3.Lerp (avgDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);	
+			minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
+			maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
+		} 
 	}
 		
 	IEnumerator AddDataPoints(){
@@ -100,7 +93,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 
 			dataPoints.Push(AddDataPoint(whiteDataPoint, new Vector3(lateralPosition, verticalPosition, distance)));
 			// Stall the loop for aesthetics as shots drop.
-			yield return new WaitForSeconds(0);
+			yield return new WaitForSeconds(.5f);
 		}
 	}
 
@@ -150,11 +143,10 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 		// Plot the shots.
 		for (int i = 0; i < shotCount; i++) {
 			
-			JSONNode shotDetail = clubTrackDriveData ["shotDispersionDetails"][i];
+			JSONNode shotDetail = shotData[i];
 			Debug.Log ("shotDetail = " + shotDetail.ToString() + " count = " + i);
 			if (shotDetail != null) {
 				float distance = shotDetail["shotDistance"];
-				if (distance != null) {
 
 					if (maxShotDistanceOnChart != -1) {
 						if (maxShotDistanceOnChart < distance) {
@@ -220,10 +212,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 					maxText.text = maxShotDistanceOnChart.ToString();
 					averageText.text = avgShotDistanceOnChart.ToString();
 					minText.text = minShotDistanceOnChart.ToString();
-
-				} else {
-					Debug.Log ("distance is null. Skipping datapoint");
-				}
 			} else {
 				Debug.Log ("AddDataPoints ShotData is null! = " + shotData);
 
@@ -271,9 +259,11 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart {
 
 	// Call should ultimately come from external platform (Mobile/Web). Json provided should drive scene.
 	public void Initialize(String json){
-		isInitialized = true;
 		Debug.Log ("Initialize() json = " + json);
 		Cleanup();
+		maxDistanceMarker.SetActive(true);
+		minDistanceMarker.SetActive(true);
+		avgDistanceMarker.SetActive(true);
 		var shotCount = 0;
 		if (json == null || json.Length == 0) {
 			// Get shot Count from JSON
