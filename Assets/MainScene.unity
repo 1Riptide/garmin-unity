@@ -2828,6 +2828,7 @@ MonoBehaviour:
   redDataPoint: {fileID: 1000012533439660, guid: 6303630fa0d384d0a93f2d677a5c7190,
     type: 2}
   chartGameObject: {fileID: 574336613}
+  maxRadialDistance: 19
 --- !u!4 &600043504 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000010988183238, guid: 2aa0684a8f48c4e90bb1d957c0a9c676,
@@ -8460,7 +8461,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1658091910
 RectTransform:
   m_ObjectHideFlags: 0

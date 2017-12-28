@@ -2,9 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraSceneControl : MonoBehaviour {
+public class CameraSceneControl : MonoBehaviour
+{
 
-	enum SceneName {DRIVE, APPROACH, CHIPPING, PUTTING};
+	enum SceneName
+	{
+DRIVE,
+		APPROACH,
+		CHIPPING,
+		PUTTING}
+
+	;
 
 	public GameObject defaultScene;
 	public float cameraTransitionSpeed;
@@ -20,20 +28,23 @@ public class CameraSceneControl : MonoBehaviour {
 	public bool isTransitioning = false;
 	private bool isPuttingSceneReady = false;
 
-	void Awake() {
+	void Awake ()
+	{
 		touchController = GetComponent<CameraTouchControl> ();
 	}
-		
-	void Start(){
+
+	void Start ()
+	{
 		#if UNITY_ANDROID
 		Debug.Log ("SignalReady() : sent to Android.");
-		AndroidJavaObject javaObj = new AndroidJavaObject("com.garmin.android.apps.golf.ui.fragments.clubtrack.ClubTrackFragment");
-		javaObj.Call("onUnityInitialized", "");
+		AndroidJavaObject javaObj = new AndroidJavaObject ("com.garmin.android.apps.golf.ui.fragments.clubtrack.ClubTrackFragment");
+		javaObj.Call ("onUnityInitialized", "");
 		#endif
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 		if (defaultScene != null) {
 			Transform target = defaultScene.transform.Find ("CameraTarget");
 			Transform topDownTarget = defaultScene.transform.Find ("CameraTargetTopDown");
@@ -57,7 +68,7 @@ public class CameraSceneControl : MonoBehaviour {
 					Debug.Log ("Update: Putting Scene READY!");
 					isPuttingSceneReady = true;
 				}
-			}else{
+			} else {
 				if (isTransitioning) {
 					Transform targetTransform = target;
 					if (defaultScene.Equals (puttingScene)) {
@@ -78,7 +89,8 @@ public class CameraSceneControl : MonoBehaviour {
 		}
 	}
 
-	public void ChangeScene(string sceneName){
+	public void ChangeScene (string sceneName)
+	{
 		Debug.Log ("ChangeScene() called in Unity! sceneName = " + sceneName);
 		if (defaultScene != null) {
 			IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
@@ -86,7 +98,7 @@ public class CameraSceneControl : MonoBehaviour {
 				chartInterface.isFocused = false;
 			}
 		}
-		SceneName newSceneName = (SceneName) System.Enum.Parse( typeof( SceneName ), sceneName );
+		SceneName newSceneName = (SceneName)System.Enum.Parse (typeof(SceneName), sceneName);
 		isTransitioning = true;
 		isPuttingSceneReady = false;
 		if (newSceneName != null) {
@@ -123,7 +135,8 @@ public class CameraSceneControl : MonoBehaviour {
 		}
 	}
 
-	public void ToggleCameraAngle(){
+	public void ToggleCameraAngle ()
+	{
 		isCameraToggledDown = !isCameraToggledDown;
 	}
 		

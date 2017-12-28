@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PuttingChart : MonoBehaviour, IGarmin3DChart {
+public class PuttingChart : MonoBehaviour, IGarmin3DChart
+{
 
-	public static Stack<GameObject> dataPoints = new Stack<GameObject>();
+	public static Stack<GameObject> dataPoints = new Stack<GameObject> ();
 	private bool isInitialized = false;
 	public GameObject puttsOverlay;
 	// only used for testing.
@@ -16,9 +17,11 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 	GameObject animatedBallShotTarget;
 	Vector3 animatedBallShotDirection;
 	Animator anim;
-	public bool isFocused {get; set;}
 
-	void Awake () {
+	public bool isFocused { get; set; }
+
+	void Awake ()
+	{
 		animatedBall = GameObject.Find ("Ball");
 		GameObject ballTarget = GameObject.Find ("BallTarget");
 
@@ -33,8 +36,9 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 		}
 	}
 
-	void Start () {
-		puttsOverlay.SetActive(isInitialized);
+	void Start ()
+	{
+		puttsOverlay.SetActive (isInitialized);
 		animatedBackground = GameObject.Find ("Background");
 		if (animatedBackground != null) {
 			anim = animatedBackground.GetComponent<Animator> ();
@@ -43,51 +47,56 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 		if (isFocused && !isInitialized) {
-			StartCoroutine(playBackgroundTransition());
-		}else if(!isFocused && isInitialized){
-			reverseBackgroundTransition();
+			StartCoroutine (playBackgroundTransition ());
+		} else if (!isFocused && isInitialized) {
+			reverseBackgroundTransition ();
 		}
 	}
 
-	IEnumerator playBackgroundTransition(){
+	IEnumerator playBackgroundTransition ()
+	{
 		Debug.Log ("playBackgroundTransition()");
 		isInitialized = true;
 		anim.Play ("PlayAnimation");
 		yield return new WaitForSeconds (1.9f);
-		StartCoroutine(TogglePuttsOverlay ());
+		StartCoroutine (TogglePuttsOverlay ());
 		if (animatedBall != null) {
-			animatedBall.SetActive(true);
+			animatedBall.SetActive (true);
 			animatedBall.transform.position = animatedBallDefaultVector;
-			animatedBall.transform.GetComponent<Rigidbody> ().AddForce(animatedBallShotDirection * 499f, ForceMode.Acceleration);
+			animatedBall.transform.GetComponent<Rigidbody> ().AddForce (animatedBallShotDirection * 499f, ForceMode.Acceleration);
 		}
 	}
 
-	public void reverseBackgroundTransition(){
+	public void reverseBackgroundTransition ()
+	{
 		Debug.Log ("reverseBackgroundTransition()");
 		isInitialized = false;
-		StartCoroutine(TogglePuttsOverlay ());
+		StartCoroutine (TogglePuttsOverlay ());
 		anim.Play ("ReverseAnimation");
 		if (animatedBall != null) {
 			animatedBall.transform.position.Equals (animatedBallDefaultVector);
-			animatedBall.SetActive(false);
+			animatedBall.SetActive (false);
 		}
 	}
 
-	IEnumerator TogglePuttsOverlay()
+	IEnumerator TogglePuttsOverlay ()
 	{
 		Debug.Log ("TogglePuttsOverlay on ? " + isInitialized);
-		puttsOverlay.SetActive(isInitialized);
+		puttsOverlay.SetActive (isInitialized);
 		yield return null;
 	}
 
-	public void MockInitialize(){
+	public void MockInitialize ()
+	{
 		// This must be called by external platform. Pass JSON.
 		//Initialize(getMockJSON());
 	}
 
-	public void Initialize(String json){
+	public void Initialize (String json)
+	{
 
 	}
 }
