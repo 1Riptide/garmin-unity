@@ -4,8 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class ApproachChart : MonoBehaviour, IGarmin3DChart
+public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 {
 	enum LieTypes
 	{
@@ -25,17 +26,20 @@ Unknown,
 	public static GameObject[] dataPoints;
 
 	public bool isFocused { get; set; }
+	public bool isDefaultState { get; set; }
 
 	public float maxRadialDistance = 19f;
-	// Properties mapped to JSON values
-	float percentHitGreen10 = 0f;
-	float percentHitGreen20 = 0f;
-	float percentHitGreen20Plus = 0f;
-	float percentMissedGreen = 0f;
-	float percentShortOfGreen = 0f;
-	float percentLongOfGreen = 0f;
-	float percentLeftOfGreen = 0f;
-	float percentRightOfGreen = 0f;
+
+	// Approach Shots in green percentage text objs.
+	public GameObject hitGreenText;
+	public GameObject middleOfGreenText ;
+	public GameObject longOfGreenText;
+
+	// Approach Shots missed green percentage text objs.
+	public GameObject missedGreenShortText;
+	public GameObject missedGreenLongText;
+	public GameObject missedGreenLeftText;
+	public GameObject missedGreenRightText;
 
 	// Used to devise a ratio with witch we plot datapoints based on real world distances.
 	private static readonly float[] DistanceBounds = new float[]{ -14.0f, 14.0f };
@@ -44,14 +48,10 @@ Unknown,
 	// Use this for initialization
 	void Start ()
 	{
-		
+		isDefaultState = true;
+		MockInitialize ();	
 	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		
-	}
+
 
 	public void MockInitialize ()
 	{
@@ -59,6 +59,7 @@ Unknown,
 		Initialize (getMockJSON ());
 	}
 
+	/*
 	void Cleanup ()
 	{
 		if (dataPoints != null) {
@@ -67,32 +68,60 @@ Unknown,
 			}
 		}
 	}
+	*/
 
 	public void Initialize (String json)
 	{
-		Debug.Log ("Initialize Approach : json = " + json);
-		Cleanup ();
-		var shotCount = 0;
+		
+		//Cleanup ();
+		//var shotCount = 0;
 		if (json == null || json.Length == 0) {
-			// Get shot Count from JSON
-			shotCount = 87;
-			try {
-				//StartCoroutine (AddDataPoints ());
-			} catch (Exception e) {
-				Debug.Log ("Exception calling AddDataPoints : " + e);
-			}
+			Debug.Log ("Exception calling AddDataPoints : ");
 		} else {
 			try {
 				Debug.Log ("Initialize() json is not null. Casting to JSON obj...");
-				StartCoroutine (AddDataPoints (json));
+				UpdateApproachStats (json);
 			} catch (Exception e) {
 				Debug.Log ("Exception parsing JSON : " + e);
 			}
 		}
 	}
+		
+	void UpdateApproachStats(String json){
+		var clubTrackApproachData = JSON.Parse (json);
+
+		// Hit Green Percentages
+		TextMesh percentHitGreen10 = hitGreenText.GetComponent<TextMesh>();
+		TextMesh percentHitGreen20 = middleOfGreenText.GetComponent<TextMesh>();
+		TextMesh percentHitGreen30 = longOfGreenText.GetComponent<TextMesh>();
+
+		percentHitGreen10.text =  clubTrackApproachData ["percentHitGreen10"];
+		percentHitGreen20.text =  clubTrackApproachData ["percentHitGreen20"];
+		percentHitGreen30.text =  clubTrackApproachData ["percentHitGreen20Plus"];
+
+		// Missed Green Percentages
+		TextMesh missedGreenShort = missedGreenShortText.GetComponent<TextMesh>();
+		TextMesh missedGreenLong = missedGreenLongText.GetComponent<TextMesh>();
+		TextMesh missedGreenLeft = missedGreenLeftText.GetComponent<TextMesh>();
+		TextMesh missedGreenRight = missedGreenRightText.GetComponent<TextMesh>();
+
+		missedGreenShort.text =  clubTrackApproachData ["percentShortOfGreen"];
+		missedGreenLong.text =  clubTrackApproachData ["percentLongOfGreen"];
+		missedGreenLeft.text =  clubTrackApproachData ["percentLeftOfGreen"];
+		missedGreenRight.text =  clubTrackApproachData ["percentRightOfGreen"];
 
 
+		/*
+		middleOfGreenText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentHitGreen20"];
+		longOfGreenText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentHitGreen30"];
 
+		missedGreenShortText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentShortOfGreen"];
+		missedGreenLongText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentLongOfGreen"];
+		missedGreenLeftText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentRightOfGreen"];
+		*/
+	}
+
+	/*
 	IEnumerator AddDataPoints (String json)
 	{
 		var clubTrackApproachData = JSON.Parse (json);
@@ -145,6 +174,7 @@ Unknown,
 		}
 	}
 
+
 	float[] createDistanceLog (JSONNode data)
 	{
 		int shotCount = data.Count;
@@ -167,7 +197,7 @@ Unknown,
 	{
 		return Instantiate (dataPoint, location, Quaternion.identity);
 	}
-
+	*/
 
 	String getMockJSON ()
 	{
@@ -178,7 +208,7 @@ Unknown,
 
 		"  \"percentLongOfGreen\": 0,\n" + "  \"percentLeftOfGreen\": 0,\n" + "  \"percentRightOfGreen\": 0,\n" +
 
-		"  \"percentGreenInRegulation\": 0,\n" + "  \"shotOrientationDetails\": [\n" + "    {\n" + "      \"remainingDistance\": 50,\n" +
+		"  \"percentGreenInRegulation\": 0,\n" + "  \"shotOrientationDetail\": [\n" + "    {\n" + "      \"remainingDistance\": 50,\n" +
 
 		"      \"startingDistanceToHole\": 95,\n" + "      \"offsetAngle\": 20,\n" + "      \"shotId\": 0,\n" +
 

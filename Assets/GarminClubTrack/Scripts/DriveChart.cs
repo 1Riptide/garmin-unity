@@ -53,12 +53,14 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		maxDistanceMarker.SetActive (false);
 		minDistanceMarker.SetActive (false);
 		avgDistanceMarker.SetActive (false);
+		MockInitialize ();
 	}
 
 	public void MockInitialize ()
 	{
 		// This must be called by external platform. Pass JSON.
 		Initialize (getMockJSON ());
+		isFocused = true;
 	}
 
 	// Looper - runs (n)times a second depending on framerate.
@@ -105,7 +107,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	IEnumerator AddDataPoints (String json)
 	{
 		var clubTrackDriveData = JSON.Parse (json);
-		var shotData = clubTrackDriveData ["shotDispersionDetails"];
+		var shotData = clubTrackDriveData ["shotDispersionDetail"];
 		var shotCount = shotData.Count;
 		Debug.Log ("AddDataPoints shotData count  " + shotCount);
 
@@ -150,7 +152,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		for (int i = 0; i < shotCount; i++) {
 			
 			JSONNode shotDetail = shotData [i];
-			Debug.Log ("shotDetail = " + shotDetail.ToString () + " count = " + i);
+			//Debug.Log ("shotDetail = " + shotDetail.ToString () + " count = " + i);
 			if (shotDetail != null) {
 				float distance = shotDetail ["shotDistance"];
 
@@ -298,7 +300,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		return "{\n" + "  \"numberOfRounds\": 0,\n" + "  \"percentFairwayLeft\": 0,\n" + "  \"percentFairwayRight\": 0,\n" +
 		"  \"percentFairwayHit\": 0,\n" + "  \"minShotDistance\": 30,\n" + "  \"maxShotDistance\": 263,\n" +
 		"  \"avgShotDistance\": 0,\n" + "  \"minDispersionDistance\": 2,\n" + "  \"maxDispersionDistance\": 80,\n" +
-		"  \"shotDispersionDetails\": [\n" + "    {\n" + "      \"shotId\": 0,\n" + "      \"scorecardId\": 0,\n" +
+		"  \"shotDispersionDetail\": [\n" + "    {\n" + "      \"shotId\": 0,\n" + "      \"scorecardId\": 0,\n" +
 		"      \"holeNumber\": 2,\n" + "      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53856,\n" +
 		"      \"dispersionDistance\": 80,\n" + "      \"shotDistance\": 190,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" +
 		"    },\n" + "    {\n" + "      \"shotId\": 1,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 3,\n" +

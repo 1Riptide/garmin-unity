@@ -7,12 +7,11 @@ public class CameraSceneControl : MonoBehaviour
 
 	enum SceneName
 	{
-DRIVE,
+		DRIVE,
 		APPROACH,
 		CHIPPING,
-		PUTTING}
-
-	;
+		PUTTING
+	};
 
 	public GameObject defaultScene;
 	public float cameraTransitionSpeed;
@@ -40,6 +39,7 @@ DRIVE,
 		AndroidJavaObject javaObj = new AndroidJavaObject ("com.garmin.android.apps.golf.ui.fragments.clubtrack.ClubTrackFragment");
 		javaObj.Call ("onUnityInitialized", "");
 		#endif
+		ChangeScene ("DRIVE");
 	}
 
 	// Update is called once per frame
@@ -60,7 +60,19 @@ DRIVE,
 						Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, topDownTarget.position, touchController.cameraDoubleTapTransitionSpeed * Time.deltaTime);
 					}
 				}
-			} else if (!isTransitioning && defaultScene.Equals (puttingScene) && !isPuttingSceneReady) {
+			}else if(!isTransitioning && defaultScene.Equals(approachScene)){
+				if (!isCameraToggledDown) {
+					if (!touchController.singleClick) {
+						Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, topDownTarget.rotation, (touchController.cameraDoubleTapTransitionSpeed*2) * Time.deltaTime);
+						Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, topDownTarget.position, (touchController.cameraDoubleTapTransitionSpeed*2) * Time.deltaTime);
+					} 
+				} else {
+					if (!touchController.singleClick) {
+						Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, (touchController.cameraDoubleTapTransitionSpeed*2) * Time.deltaTime);
+						Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, (touchController.cameraDoubleTapTransitionSpeed*2) * Time.deltaTime);
+					}
+				}
+			}else if (!isTransitioning && defaultScene.Equals (puttingScene) && !isPuttingSceneReady) {
 				if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation) {
 					Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed / 4);
 					Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed / 4);
@@ -75,6 +87,9 @@ DRIVE,
 						targetTransform = topDownTarget;
 						Debug.Log ("Update: Putting Scene Transisitoning.");
 						isPuttingSceneReady = false;
+					}
+					if (defaultScene.Equals (approachScene)){
+						targetTransform = topDownTarget;
 					}
 					if (Camera.main.transform.position != targetTransform.position || Camera.main.transform.rotation != targetTransform.rotation) {
 						Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, targetTransform.rotation, cameraTransitionSpeed);
@@ -104,7 +119,7 @@ DRIVE,
 		if (newSceneName != null) {
 			switch (newSceneName) {
 			case SceneName.APPROACH:
-				isCameraToggledDown = true;
+				isCameraToggledDown = false;
 				defaultScene = approachScene;
 				break;
 			case SceneName.CHIPPING:
@@ -127,7 +142,7 @@ DRIVE,
 			if (defaultScene != null) {
 				IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
 				chartInterface.isFocused = true;
-				touchController.SceneChanged ();
+				touchController.ResetFOV ();
 				Debug.Log ("ChangeScene : found scene reseting Camera Fov  - " + newSceneName);
 			} else {
 				Debug.Log ("ChangeScene : could not find scene " + newSceneName);
