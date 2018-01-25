@@ -53,7 +53,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		maxDistanceMarker.SetActive (false);
 		minDistanceMarker.SetActive (false);
 		avgDistanceMarker.SetActive (false);
-		MockInitialize ();
+		//MockInitialize ();
 	}
 
 	public void MockInitialize ()
@@ -70,7 +70,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 			avgDistanceMarker.transform.position = Vector3.Lerp (avgDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);	
 			minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
 			maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
-		} 
+		}
 	}
 
 	IEnumerator AddDataPoints ()
@@ -107,7 +107,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	IEnumerator AddDataPoints (String json)
 	{
 		var clubTrackDriveData = JSON.Parse (json);
-		var shotData = clubTrackDriveData ["shotDispersionDetail"];
+		var shotData = clubTrackDriveData ["shotDispersionDetails"];
 		var shotCount = shotData.Count;
 		Debug.Log ("AddDataPoints shotData count  " + shotCount);
 
@@ -116,9 +116,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		float minDistance = clubTrackDriveData ["minShotDistance"];
 		float maxLateralDistance = clubTrackDriveData ["maxDispersionDistance"];
 		float minLateralDistance = clubTrackDriveData ["minDispersionDistance"];
-
-		float distanceRange = maxDistance - minDistance;
-		float lateralRange = maxLateralDistance - minLateralDistance;
 
 		// Get the min and max bounds for both length and width of 3D space coords.
 		float zMinBounds = DistanceBounds [0];
@@ -273,21 +270,15 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	{
 		Debug.Log ("Initialize() json = " + json);
 		Cleanup ();
-		maxDistanceMarker.SetActive (true);
-		minDistanceMarker.SetActive (true);
-		avgDistanceMarker.SetActive (true);
-		var shotCount = 0;
+
 		if (json == null || json.Length == 0) {
-			// Get shot Count from JSON
-			shotCount = 87;
-			try {
-				StartCoroutine (AddDataPoints ());
-			} catch (Exception e) {
-				Debug.Log ("Exception calling AddDataPoints : " + e);
-			}
+			Debug.Log ("Exception calling AddDataPoints : ");
 		} else {
 			try {
 				Debug.Log ("Initialize() json is not null. Casting to JSON obj...");
+				maxDistanceMarker.SetActive (true);
+				minDistanceMarker.SetActive (true);
+				avgDistanceMarker.SetActive (true);
 				StartCoroutine (AddDataPoints (json));
 			} catch (Exception e) {
 				Debug.Log ("Exception parsing JSON : " + e);
@@ -300,7 +291,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		return "{\n" + "  \"numberOfRounds\": 0,\n" + "  \"percentFairwayLeft\": 0,\n" + "  \"percentFairwayRight\": 0,\n" +
 		"  \"percentFairwayHit\": 0,\n" + "  \"minShotDistance\": 30,\n" + "  \"maxShotDistance\": 263,\n" +
 		"  \"avgShotDistance\": 0,\n" + "  \"minDispersionDistance\": 2,\n" + "  \"maxDispersionDistance\": 80,\n" +
-		"  \"shotDispersionDetail\": [\n" + "    {\n" + "      \"shotId\": 0,\n" + "      \"scorecardId\": 0,\n" +
+		"  \"shotDispersionDetails\": [\n" + "    {\n" + "      \"shotId\": 0,\n" + "      \"scorecardId\": 0,\n" +
 		"      \"holeNumber\": 2,\n" + "      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53856,\n" +
 		"      \"dispersionDistance\": 80,\n" + "      \"shotDistance\": 190,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" +
 		"    },\n" + "    {\n" + "      \"shotId\": 1,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 3,\n" +

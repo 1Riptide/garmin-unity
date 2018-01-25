@@ -10,7 +10,7 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 {
 	enum LieTypes
 	{
-Unknown,
+		Unknown,
 		Teebox,
 		Rough,
 		Bunker,
@@ -19,6 +19,8 @@ Unknown,
 		Waste}
 
 	;
+
+	private string defaultPercentage = "--";
 	// Default shot object.
 	public GameObject whiteDataPoint;
 	public GameObject redDataPoint;
@@ -26,13 +28,14 @@ Unknown,
 	public static GameObject[] dataPoints;
 
 	public bool isFocused { get; set; }
+	// is user looking here?
 	public bool isDefaultState { get; set; }
+	// assuming chart has multiples. Can be anything.
 
-	public float maxRadialDistance = 19f;
-
+	public GameObject hide4NonClubTrack;
 	// Approach Shots in green percentage text objs.
 	public GameObject hitGreenText;
-	public GameObject middleOfGreenText ;
+	public GameObject middleOfGreenText;
 	public GameObject longOfGreenText;
 
 	// Approach Shots missed green percentage text objs.
@@ -59,22 +62,8 @@ Unknown,
 		Initialize (getMockJSON ());
 	}
 
-	/*
-	void Cleanup ()
-	{
-		if (dataPoints != null) {
-			foreach (GameObject data in dataPoints) {
-				Destroy (data);
-			}
-		}
-	}
-	*/
-
 	public void Initialize (String json)
 	{
-		
-		//Cleanup ();
-		//var shotCount = 0;
 		if (json == null || json.Length == 0) {
 			Debug.Log ("Exception calling AddDataPoints : ");
 		} else {
@@ -86,118 +75,82 @@ Unknown,
 			}
 		}
 	}
-		
-	void UpdateApproachStats(String json){
+
+	void UpdateApproachStats (String json)
+	{
 		var clubTrackApproachData = JSON.Parse (json);
+		bool usingClubTrack = clubTrackApproachData ["usingClubtrack"];
 
+		Debug.Log ("UpdateApproachStats - json = \n" + usingClubTrack);
 		// Hit Green Percentages
-		TextMesh percentHitGreen10 = hitGreenText.GetComponent<TextMesh>();
-		TextMesh percentHitGreen20 = middleOfGreenText.GetComponent<TextMesh>();
-		TextMesh percentHitGreen30 = longOfGreenText.GetComponent<TextMesh>();
-
-		percentHitGreen10.text =  clubTrackApproachData ["percentHitGreen10"];
-		percentHitGreen20.text =  clubTrackApproachData ["percentHitGreen20"];
-		percentHitGreen30.text =  clubTrackApproachData ["percentHitGreen20Plus"];
+		TextMesh percentHitGreen10 = hitGreenText.GetComponent<TextMesh> ();
+		TextMesh percentHitGreen20 = middleOfGreenText.GetComponent<TextMesh> ();
+		TextMesh percentHitGreen30 = longOfGreenText.GetComponent<TextMesh> ();
 
 		// Missed Green Percentages
-		TextMesh missedGreenShort = missedGreenShortText.GetComponent<TextMesh>();
-		TextMesh missedGreenLong = missedGreenLongText.GetComponent<TextMesh>();
-		TextMesh missedGreenLeft = missedGreenLeftText.GetComponent<TextMesh>();
-		TextMesh missedGreenRight = missedGreenRightText.GetComponent<TextMesh>();
+		TextMesh missedGreenShort = missedGreenShortText.GetComponent<TextMesh> ();
+		TextMesh missedGreenLong = missedGreenLongText.GetComponent<TextMesh> ();
+		TextMesh missedGreenLeft = missedGreenLeftText.GetComponent<TextMesh> ();
+		TextMesh missedGreenRight = missedGreenRightText.GetComponent<TextMesh> ();
 
-		missedGreenShort.text =  clubTrackApproachData ["percentShortOfGreen"];
-		missedGreenLong.text =  clubTrackApproachData ["percentLongOfGreen"];
-		missedGreenLeft.text =  clubTrackApproachData ["percentLeftOfGreen"];
-		missedGreenRight.text =  clubTrackApproachData ["percentRightOfGreen"];
+		if (usingClubTrack) {
+			var hitGreen10Percent = clubTrackApproachData ["percentHitGreen10"];
+			var hitGreen20Percent = clubTrackApproachData ["percentHitGreen20"];
+			var hitGreen20PlusPercent = clubTrackApproachData ["percentHitGreen20Plus"];
 
+			percentHitGreen10.text = (hitGreen10Percent != null && hitGreen10Percent != "0") ? hitGreen10Percent + "%" : defaultPercentage + "%";
+			percentHitGreen20.text = (hitGreen20Percent != null && hitGreen20Percent != "0") ? hitGreen20Percent + "%" : defaultPercentage + "%";
+			percentHitGreen30.text = (hitGreen20PlusPercent != null && hitGreen20PlusPercent != "0") ? hitGreen20PlusPercent + "%" : defaultPercentage + "%";
 
-		/*
-		middleOfGreenText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentHitGreen20"];
-		longOfGreenText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentHitGreen30"];
-
-		missedGreenShortText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentShortOfGreen"];
-		missedGreenLongText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentLongOfGreen"];
-		missedGreenLeftText.gameObject.GetComponent<UnityEngine.UI.Text>().text =  clubTrackApproachData ["percentRightOfGreen"];
-		*/
-	}
-
-	/*
-	IEnumerator AddDataPoints (String json)
-	{
-		var clubTrackApproachData = JSON.Parse (json);
-		var shotData = clubTrackApproachData ["shotOrientationDetails"];
-		var shotCount = shotData.Count;
-		dataPoints = new GameObject[shotCount];
-		Debug.Log ("AddDataPoints shotData count  " + shotCount);
-
-		// Origin of datapoint creation
-		Vector3 origin = chartGameObject.transform.position;
-		// Log of distances
-		float[] shotDistanceLog = createDistanceLog (clubTrackApproachData);
-		// Outter band of Dartbord scale is 21 x 21.
-		// Outter max is 33 x 33
-		var maxValue = shotDistanceLog.Max ();
-		float scaleRatio = maxValue / maxRadialDistance;
-
-		for (int i = 0; i < shotCount; i++) {
-
-			JSONNode shotOrientationDetail = shotData [i];
-			Debug.Log ("shotOrientationDetail = " + shotOrientationDetail.ToString () + " count = " + i);
-
-			var distance = shotOrientationDetail ["remainingDistance"]; // chip shot in-hole
-			var angle = shotOrientationDetail ["offsetAngle"];// North being 0. Range[0-359]
-			var lieType = shotOrientationDetail ["endingLieType"];
-			shotDistanceLog [i] = distance;
-			// Calculate distance and angle from origin. *Scaled to fit screen*
-			Vector3 newPosition = (chartGameObject.transform.position +
-			                      Quaternion.AngleAxis (angle, Vector3.up) * Vector3.forward * (distance / scaleRatio));
-
-			// Create instance
-			GameObject clone;
-			if (!lieType.Equals (LieTypes.Green.ToString ())) {
-				// Miss range is [21 - 39]
-				// Red
-				clone = AddDataPoint (redDataPoint, newPosition);
-
-			} else {
-				// Hit range is [0-21]
-				// White
-				clone = AddDataPoint (whiteDataPoint, newPosition);
-			}
-
-			// Reassign parent to chart object for tidyness.
-			clone.transform.parent = chartGameObject.transform;
-			// Add to list
-			dataPoints [i] = clone;
-
-			yield return new WaitForSeconds (0);
+		} else {
+			hide4NonClubTrack.SetActive (false);
+			var hitGreenPercent = clubTrackApproachData ["percentHitGreen"];
+			percentHitGreen10.text = (hitGreenPercent != null && hitGreenPercent != "0") ? hitGreenPercent + "%" : defaultPercentage + "%";
 		}
+		var shortOfGreenPercent = clubTrackApproachData ["percentShortOfGreen"];
+		var longOfGreenPercent = clubTrackApproachData ["percentLongOfGreen"];
+		var leftOfGreenPercent = clubTrackApproachData ["percentLeftOfGreen"];
+		var rightOfGreenPercent = clubTrackApproachData ["percentRightOfGreen"];
+
+		missedGreenShort.text = (shortOfGreenPercent != null && shortOfGreenPercent != "0") ? shortOfGreenPercent + "%" : defaultPercentage + "%";
+		missedGreenLong.text = (longOfGreenPercent != null && longOfGreenPercent != "0") ? longOfGreenPercent  + "%" : defaultPercentage + "%";
+		missedGreenLeft.text = (leftOfGreenPercent != null && leftOfGreenPercent != "0") ? leftOfGreenPercent  + "%" : defaultPercentage + "%"; 
+		missedGreenRight.text = (rightOfGreenPercent != null && rightOfGreenPercent != "0") ? rightOfGreenPercent  + "%" : defaultPercentage + "%"; 
+
 	}
 
 
-	float[] createDistanceLog (JSONNode data)
-	{
-		int shotCount = data.Count;
-		float[] shotDistanceLog = new float[shotCount];
-		var shotData = data ["shotOrientationDetails"];
-		for (int i = 0; i < shotCount; i++) {
-
-			JSONNode shotOrientationDetail = shotData [i];
-			Debug.Log ("shotOrientationDetail = " + shotOrientationDetail.ToString () + " count = " + i);
-
-			var distance = shotOrientationDetail ["remainingDistance"]; // chip shot in-hole
-			var angle = shotOrientationDetail ["offsetAngle"];// North being 0. Range[0-359]
-			var lieType = shotOrientationDetail ["endingLieType"];
-			shotDistanceLog [i] = distance;
+	/** Approach GCS Contract as of 1/24/18
+	 {
+		  "numberOfRounds": 0,
+		  "usingClubtrack": true,
+		  "percentHitGreen": 0,
+		  "percentHitGreen10": 0,
+		  "percentHitGreen20": 0,
+		  "percentHitGreen20Plus": 0,
+		  "percentMissedGreen": 0,
+		  "percentShortOfGreen": 0,
+		  "percentLongOfGreen": 0,
+		  "percentLeftOfGreen": 0,
+		  "percentRightOfGreen": 0,
+		  "percentGreenInRegulation": 0,
+		  "shotOrientationDetail": [
+		    {
+		      "remainingDistance": 0,
+		      "startingDistanceToHole": 0,
+		      "offsetAngle": 0,
+		      "shotId": 0,
+		      "clubId": 0,
+		      "scorecardId": 0,
+		      "holeNumber": 0,
+		      "startingLieType": "Unknown",
+		      "endingLieType": "Unknown",
+		      "onePuttAfter": true,
+		      "strokesGained": 0
+		    }
+		  ]
 		}
-		return shotDistanceLog;
-	}
-
-	GameObject AddDataPoint (GameObject dataPoint, Vector3 location)
-	{
-		return Instantiate (dataPoint, location, Quaternion.identity);
-	}
-	*/
+	 */ 
 
 	String getMockJSON ()
 	{

@@ -9,15 +9,14 @@ public class ApproachChartWithShots : MonoBehaviour, IGarmin3DChart
 {
 	enum LieTypes
 	{
-Unknown,
+		Unknown,
 		Teebox,
 		Rough,
 		Bunker,
 		Fairway,
 		Green,
-		Waste}
-
-	;
+		Waste
+	};
 	// Default shot object.
 	public GameObject whiteDataPoint;
 	public GameObject redDataPoint;
@@ -44,7 +43,7 @@ Unknown,
 	// Use this for initialization
 	void Start ()
 	{
-		
+		MockInitialize ();
 	}
 	
 	// Update is called once per frame

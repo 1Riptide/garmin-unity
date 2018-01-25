@@ -14,17 +14,11 @@ public class CameraTouchControl : MonoBehaviour
 	private static readonly float PanSpeed = 20f;
 	private static readonly float ZoomSpeedTouch = 0.1f;
 	private static readonly float ZoomSpeedMouse = 0.5f;
-	private static readonly float[] positionBoundsX = new float[]{ -8f, 8f };
-	private static readonly float[] positionBoundsZ = new float[]{ -36f, -12f };
-	private static readonly float[] positionBoundsY = new float[]{ 28f, 28f };
 	private static readonly float[] ZoomBounds = new float[]{ 10f, 80f };
-
 	// For counting taps OR clicks.
 	int inputCount = 0;
 	// Camera position when looking down at chart.
 	public Vector3 cameraTopPosition = new Vector3 (0, 28, 0);
-	// Obtained at runtime.
-	//public Vector3 cameraDefaultPosition;
 	// Speed of camera transition
 	public float cameraDoubleTapTransitionSpeed = 1.5f;
 	public bool singleClick;
@@ -47,7 +41,7 @@ public class CameraTouchControl : MonoBehaviour
 	{
 		if (sceneController.defaultScene == null) {
 			return;
-		}else if (!sceneController.defaultScene.Equals (sceneController.approachScene) && !sceneController.defaultScene.Equals (sceneController.driveScene)) {
+		} else if (!sceneController.defaultScene.Equals (sceneController.approachScene) && !sceneController.defaultScene.Equals (sceneController.driveScene)) {
 			return;
 		}
 		// defaultScene is either drive or approach - process input events.
@@ -63,17 +57,15 @@ public class CameraTouchControl : MonoBehaviour
 		if (sceneController.defaultScene.Equals (sceneController.approachScene)) {
 			nestedChartInterface = sceneController.defaultScene.GetComponent (typeof(IGarminNestedChart)) as IGarminNestedChart;
 			Debug.Log ("B4 HandleTouch - Approach - isDefaultState? = " + nestedChartInterface.isDefaultState);
-			//nestedChartInterface.isDefaultState = !nestedChartInterface.isDefaultState;
-			Debug.Log ("HandleTouch - Approach - isDefaultState? = " + nestedChartInterface.isDefaultState);
 		}
-
 
 		switch (Input.touchCount) {
 		case 1: 
 			// If the touch began, capture its position and its finger ID. Otherwise, if the finger ID of the touch doesn't match, skip it.
 			Touch touch = Input.GetTouch (0);
+
 			if (touch.phase == TouchPhase.Moved) {
-				if (nestedChartInterface == null || !nestedChartInterface.isDefaultState) {
+				if (sceneController.defaultScene.Equals(sceneController.driveScene) || nestedChartInterface != null && !nestedChartInterface.isDefaultState) {
 					PanCamera (touch.position);
 				}
 				
@@ -89,12 +81,14 @@ public class CameraTouchControl : MonoBehaviour
 					} else {
 						// double click
 						if (sceneController.defaultScene.Equals (sceneController.approachScene)) {
-							nestedChartInterface = sceneController.defaultScene.GetComponent (typeof(IGarminNestedChart)) as IGarminNestedChart;
 							Debug.Log ("B4 HandleMouse - Approach - isDefaultState? = " + nestedChartInterface.isDefaultState);
 							nestedChartInterface.isDefaultState = !nestedChartInterface.isDefaultState;
+							if (nestedChartInterface.isDefaultState) {
+								ResetFOV ();
+							}
 						}
-						singleClick = false;
 						sceneController.ToggleCameraAngle ();
+						singleClick = false;
 					}
 				} 
 				doubleClickTimeBasis = Time.time;
@@ -110,8 +104,10 @@ public class CameraTouchControl : MonoBehaviour
 				float newDistance = Vector2.Distance (newPositions [0], newPositions [1]);
 				float oldDistance = Vector2.Distance (lastZoomPositions [0], lastZoomPositions [1]);
 				float offset = newDistance - oldDistance;
-				ZoomCamera (offset, ZoomSpeedTouch);
-				lastZoomPositions = newPositions;
+				if (!sceneController.defaultScene.Equals (sceneController.approachScene) || !nestedChartInterface.isDefaultState) {
+					ZoomCamera (offset, ZoomSpeedTouch);
+					lastZoomPositions = newPositions;
+				}
 			}
 			break;
 		default: 
@@ -123,26 +119,28 @@ public class CameraTouchControl : MonoBehaviour
 
 	void HandleMouse ()
 	{
+		IGarminNestedChart nestedChartInterface = sceneController.defaultScene.GetComponent (typeof(IGarminNestedChart)) as IGarminNestedChart;
+		// At last measure, did user single tap/click? (if double tap/clicking we can skip checking scrollWheel)
 		if (inputCount < 2) {
 			float scroll = Input.GetAxis ("Mouse ScrollWheel");
-			ZoomCamera (scroll, ZoomSpeedMouse);
+			// Do not zoom for Approach if not focused on the nested (scatter) chart.
+			if (!sceneController.defaultScene.Equals (sceneController.approachScene) || nestedChartInterface.isDefaultState) {
+				ZoomCamera (scroll, ZoomSpeedMouse);
+			}
 		}
-
-		IGarminNestedChart nestedChartInterface = null;
-
+			
 		if (Input.GetMouseButtonDown (0)) {
 			if (doubleClickTimeBasis == 0) {
 				// Default state. No clicks recorded.
 				lastPanPosition = Input.mousePosition;
 			} else {
-				// Last known state was singleClick - and another click came is recorded. Test:
+				// Last known state was singleClick - and another click is recorded. Test:
 				if ((Time.time - doubleClickTimeBasis) > doubleClickThreshold) {
 					lastPanPosition = Input.mousePosition;
 					singleClick = true;
 				} else {
 					// double click
 					if (sceneController.defaultScene.Equals (sceneController.approachScene)) {
-						nestedChartInterface = sceneController.defaultScene.GetComponent (typeof(IGarminNestedChart)) as IGarminNestedChart;
 						Debug.Log ("B4 HandleMouse - Approach - isDefaultState? = " + nestedChartInterface.isDefaultState);
 						nestedChartInterface.isDefaultState = !nestedChartInterface.isDefaultState;
 						if (nestedChartInterface.isDefaultState) {
@@ -155,15 +153,7 @@ public class CameraTouchControl : MonoBehaviour
 			} 
 			doubleClickTimeBasis = Time.time;
 		} else if (Input.GetMouseButton (0)) {
-			
-			if (sceneController.defaultScene.Equals (sceneController.approachScene)) {
-
-				nestedChartInterface = sceneController.defaultScene.GetComponent (typeof(IGarminNestedChart)) as IGarminNestedChart;
-				Debug.Log ("B4 HandleMouse - Approach - isDefaultState? = " + nestedChartInterface.isDefaultState);
-				nestedChartInterface.isDefaultState = !nestedChartInterface.isDefaultState;
-				Debug.Log ("HandleMouse - Approach - isDefaultState? = " + nestedChartInterface.isDefaultState);
-			}
-			if (nestedChartInterface == null || nestedChartInterface !=null && !nestedChartInterface.isDefaultState) {
+			if (sceneController.defaultScene.Equals(sceneController.driveScene)  || nestedChartInterface != null && !nestedChartInterface.isDefaultState) {
 				Debug.Log ("HandleMouse = Panning!!!");
 				PanCamera (Input.mousePosition);
 			}
