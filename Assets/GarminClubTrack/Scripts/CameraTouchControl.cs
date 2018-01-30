@@ -8,13 +8,13 @@ public class CameraTouchControl : MonoBehaviour
 	private Camera cam;
 	private Vector3 lastPanPosition;
 	private bool wasZoomingLastFrame;
-	// Touch mode only
-	private Vector2[] lastZoomPositions;
-	// Touch mode only
 	private static readonly float PanSpeed = 20f;
 	private static readonly float ZoomSpeedTouch = 0.1f;
-	private static readonly float ZoomSpeedMouse = 0.5f;
 	private static readonly float[] ZoomBounds = new float[]{ 10f, 80f };
+	// Touch mode only
+	private Vector2[] lastZoomPositions;
+	// click mode only
+	private static readonly float ZoomSpeedMouse = 0.5f;
 	// For counting taps OR clicks.
 	int inputCount = 0;
 	// Camera position when looking down at chart.

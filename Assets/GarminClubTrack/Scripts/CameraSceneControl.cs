@@ -42,7 +42,7 @@ public class CameraSceneControl : MonoBehaviour
 		#endif
 
 		// TODO: REMOVE BEFORE RELEASE
-		//ChangeScene ("DRIVE");
+		ChangeScene ("CHIPPING");
 	}
 		
 	void Update ()

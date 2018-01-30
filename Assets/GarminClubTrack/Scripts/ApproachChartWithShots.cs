@@ -1,55 +1,19 @@
 ﻿using System;
 using System.Linq;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
-using UnityEngine;
 
-public class ApproachChartWithShots : MonoBehaviour, IGarmin3DChart
+public class ApproachChartWithShots : ShotChart, IGarmin3DChart
 {
-	enum LieTypes
-	{
-		Unknown,
-		Teebox,
-		Rough,
-		Bunker,
-		Fairway,
-		Green,
-		Waste
-	};
-	// Default shot object.
-	public GameObject whiteDataPoint;
-	public GameObject redDataPoint;
-	public GameObject chartGameObject;
-	public static GameObject[] dataPoints;
 
 	public bool isFocused { get; set; }
-
-	public float maxRadialDistance = 19f;
-	// Properties mapped to JSON values
-	float percentHitGreen10 = 0f;
-	float percentHitGreen20 = 0f;
-	float percentHitGreen20Plus = 0f;
-	float percentMissedGreen = 0f;
-	float percentShortOfGreen = 0f;
-	float percentLongOfGreen = 0f;
-	float percentLeftOfGreen = 0f;
-	float percentRightOfGreen = 0f;
-
-	// Used to devise a ratio with witch we plot datapoints based on real world distances.
-	private static readonly float[] DistanceBounds = new float[]{ -14.0f, 14.0f };
-	private static readonly float[] LateralBounds = new float[]{ -9.0f, 9.0f };
 
 	// Use this for initialization
 	void Start ()
 	{
-		MockInitialize ();
-	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		
+		MockInitialize ();	
 	}
 
 	public void MockInitialize ()
@@ -57,35 +21,18 @@ public class ApproachChartWithShots : MonoBehaviour, IGarmin3DChart
 		// This must be called by external platform. Pass JSON.
 		Initialize (getMockJSON ());
 	}
-
-	void Cleanup ()
-	{
-		if (dataPoints != null) {
-			foreach (GameObject data in dataPoints) {
-				Destroy (data);
-			}
-		}
-	}
-
+		
 	public void Initialize (String json)
 	{
-		
-		Cleanup ();
-		var shotCount = 0;
 		if (json == null || json.Length == 0) {
-			// Get shot Count from JSON
-			shotCount = 87;
-			try {
-				//StartCoroutine (AddDataPoints ());
-			} catch (Exception e) {
-				Debug.Log ("Exception calling AddDataPoints : " + e);
-			}
+			Debug.Log ("Initialize : json problems...Calling Initialize() : looks like json is empty? json = \n" + json);
 		} else {
 			try {
 				Debug.Log ("Initialize() json is not null. Casting to JSON obj...");
+				Cleanup ();
 				StartCoroutine (AddDataPoints (json));
 			} catch (Exception e) {
-				Debug.Log ("Exception parsing JSON : " + e);
+				Debug.Log ("Exception parsing JSON : " + e); 
 			}
 		}
 	}
@@ -101,7 +48,7 @@ public class ApproachChartWithShots : MonoBehaviour, IGarmin3DChart
 		// Origin of datapoint creation
 		Vector3 origin = chartGameObject.transform.position;
 		// Log of distances
-		float[] shotDistanceLog = createDistanceLog (clubTrackApproachData);
+		float[] shotDistanceLog = createDistanceLog (clubTrackApproachData, "shotOrientationDetails");
 		// Outter band of Dartbord scale is 21 x 21.
 		// Outter max is 33 x 33
 		var maxValue = shotDistanceLog.Max ();
@@ -125,12 +72,12 @@ public class ApproachChartWithShots : MonoBehaviour, IGarmin3DChart
 			if (!lieType.Equals (LieTypes.Green.ToString ())) {
 				// Miss range is [21 - 39]
 				// Red
-				clone = AddDataPoint (redDataPoint, newPosition);
+				clone = AddDataPoint (missDataPointPrefab, newPosition);
 
 			} else {
 				// Hit range is [0-21]
 				// White
-				clone = AddDataPoint (whiteDataPoint, newPosition);
+				clone = AddDataPoint (hitDataPointPrefab, newPosition);
 			}
 
 			// Reassign parent to chart object for tidyness.
@@ -142,28 +89,6 @@ public class ApproachChartWithShots : MonoBehaviour, IGarmin3DChart
 		}
 	}
 
-	float[] createDistanceLog (JSONNode data)
-	{
-		int shotCount = data.Count;
-		float[] shotDistanceLog = new float[shotCount];
-		var shotData = data ["shotOrientationDetails"];
-		for (int i = 0; i < shotCount; i++) {
-
-			JSONNode shotOrientationDetail = shotData [i];
-			Debug.Log ("shotOrientationDetail = " + shotOrientationDetail.ToString () + " count = " + i);
-
-			var distance = shotOrientationDetail ["remainingDistance"]; // chip shot in-hole
-			var angle = shotOrientationDetail ["offsetAngle"];// North being 0. Range[0-359]
-			var lieType = shotOrientationDetail ["endingLieType"];
-			shotDistanceLog [i] = distance;
-		}
-		return shotDistanceLog;
-	}
-
-	GameObject AddDataPoint (GameObject dataPoint, Vector3 location)
-	{
-		return Instantiate (dataPoint, location, Quaternion.identity);
-	}
 
 	String getMockJSON ()
 	{

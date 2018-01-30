@@ -16,9 +16,8 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 		Bunker,
 		Fairway,
 		Green,
-		Waste}
-
-	;
+		Waste
+	};
 
 	private string defaultPercentage = "--";
 	// Default shot object.
@@ -44,17 +43,12 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 	public GameObject missedGreenLeftText;
 	public GameObject missedGreenRightText;
 
-	// Used to devise a ratio with witch we plot datapoints based on real world distances.
-	private static readonly float[] DistanceBounds = new float[]{ -14.0f, 14.0f };
-	private static readonly float[] LateralBounds = new float[]{ -9.0f, 9.0f };
-
 	// Use this for initialization
 	void Start ()
 	{
 		isDefaultState = true;
 		MockInitialize ();	
 	}
-
 
 	public void MockInitialize ()
 	{
@@ -113,9 +107,9 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 		var rightOfGreenPercent = clubTrackApproachData ["percentRightOfGreen"];
 
 		missedGreenShort.text = (shortOfGreenPercent != null && shortOfGreenPercent != "0") ? shortOfGreenPercent + "%" : defaultPercentage + "%";
-		missedGreenLong.text = (longOfGreenPercent != null && longOfGreenPercent != "0") ? longOfGreenPercent  + "%" : defaultPercentage + "%";
-		missedGreenLeft.text = (leftOfGreenPercent != null && leftOfGreenPercent != "0") ? leftOfGreenPercent  + "%" : defaultPercentage + "%"; 
-		missedGreenRight.text = (rightOfGreenPercent != null && rightOfGreenPercent != "0") ? rightOfGreenPercent  + "%" : defaultPercentage + "%"; 
+		missedGreenLong.text = (longOfGreenPercent != null && longOfGreenPercent != "0") ? longOfGreenPercent + "%" : defaultPercentage + "%";
+		missedGreenLeft.text = (leftOfGreenPercent != null && leftOfGreenPercent != "0") ? leftOfGreenPercent + "%" : defaultPercentage + "%"; 
+		missedGreenRight.text = (rightOfGreenPercent != null && rightOfGreenPercent != "0") ? rightOfGreenPercent + "%" : defaultPercentage + "%"; 
 
 	}
 
