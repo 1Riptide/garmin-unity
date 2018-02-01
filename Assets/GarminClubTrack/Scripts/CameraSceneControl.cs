@@ -15,11 +15,11 @@ public class CameraSceneControl : MonoBehaviour
 
 	private SceneName sceneNameEnum;
 	public GameObject defaultScene;
-	public float cameraTransitionSpeed;
 	public GameObject driveScene;
 	public GameObject approachScene;
 	public GameObject chippingScene;
 	public GameObject puttingScene;
+	public float cameraTransitionSpeed = .7f;
 
 	// Used to determine if we are looking straight down at the chart, or from an angle.
 	public static bool isCameraToggledDown = false;
@@ -39,10 +39,8 @@ public class CameraSceneControl : MonoBehaviour
 		Debug.Log ("SignalReady() : sent to Android.");
 		AndroidJavaObject javaObj = new AndroidJavaObject ("com.garmin.android.apps.golf.ui.fragments.clubtrack.ClubTrackFragment");
 		javaObj.Call ("onUnityInitialized", "");
+		Screen.fullScreen = false;
 		#endif
-
-		// TODO: REMOVE BEFORE RELEASE
-		ChangeScene ("CHIPPING");
 	}
 		
 	void Update ()
@@ -135,11 +133,12 @@ public class CameraSceneControl : MonoBehaviour
 		sceneNameEnum = (SceneName)System.Enum.Parse (typeof(SceneName), sceneName);
 		isTransitioning = true;
 		isPuttingSceneReady = false;
-		if (sceneNameEnum != null) {
-			switch (sceneNameEnum) {
+		switch (sceneNameEnum) {
 			case SceneName.APPROACH:
+				defaultScene = approachScene;	
+				IGarminNestedChart nestedChartInterface = defaultScene.GetComponent (typeof(IGarminNestedChart)) as IGarminNestedChart;
+				nestedChartInterface.isDefaultState = true;
 				isCameraToggledDown = false;
-				defaultScene = approachScene;
 				break;
 			case SceneName.CHIPPING:
 				isCameraToggledDown = true;
@@ -155,17 +154,15 @@ public class CameraSceneControl : MonoBehaviour
 				isCameraToggledDown = false;
 				defaultScene = driveScene;
 				break;
-			}
-
-			// Enable Scene
-			if (defaultScene != null) {
-				IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
-				chartInterface.isFocused = true;
-				touchController.ResetFOV ();
-				Debug.Log ("ChangeScene : found scene reseting Camera Fov  - " + sceneNameEnum);
-			} else {
-				Debug.Log ("ChangeScene : could not find scene " + sceneNameEnum);
-			}
+		}
+		// Enable Scene
+		if (defaultScene != null) {
+			IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
+			chartInterface.isFocused = true;
+			touchController.ResetFOV ();
+			Debug.Log ("ChangeScene : found scene reseting Camera Fov  - " + sceneNameEnum);
+		} else {
+			Debug.Log ("ChangeScene : could not find scene " + sceneNameEnum);
 		}
 	}
 

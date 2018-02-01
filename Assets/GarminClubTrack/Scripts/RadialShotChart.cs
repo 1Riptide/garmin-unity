@@ -6,7 +6,7 @@ using System.Linq;
 
 public class RadialShotChart : MonoBehaviour
 {
-	protected enum LieTypes
+	public enum LieTypes
 	{
 		Unknown,
 		Teebox,
@@ -16,13 +16,14 @@ public class RadialShotChart : MonoBehaviour
 		Green,
 		Waste
 	};
-		
+	// Default. Override in editor.
+	public float maxRadialDistance = 19f;	
 	public GameObject chartGameObject;
 	public GameObject hitDataPointPrefab;
 	public GameObject missDataPointPrefab;
 	protected GameObject[] dataPoints;
-	public float maxRadialDistance = 19f;
 	private Vector3 origin;
+	public bool isFocused { get; set; }
 
 	public void Cleanup ()
 	{
@@ -39,16 +40,15 @@ public class RadialShotChart : MonoBehaviour
 		return Instantiate (dataPoint, origin + location, Quaternion.identity);
 	}
 
-	public float[] createDistanceLog (JSONNode data, String nodeName)
+	public float[] createDistanceLog (JSONNode data, String nodeName, String propertyName)
 	{
 		int nodeCount = data.Count;
 		float[] shotDistanceLog = new float[nodeCount];
 		var shotData = data [nodeName];
-		Debug.Log ("createDistanceLog Json = " + data.ToString());
 		for (int i = 0; i < nodeCount; i++) {
 			JSONNode thisDetail = shotData [i];
-			// Hard coded assumption.
-			shotDistanceLog [i] = thisDetail ["remainingDistance"];
+			// Hard coded assumption. 
+			shotDistanceLog [i] = thisDetail [propertyName];
 		}
 		return shotDistanceLog;
 	}

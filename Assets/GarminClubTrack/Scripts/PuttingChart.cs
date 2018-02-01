@@ -17,6 +17,8 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 	GameObject animatedBallShotTarget;
 	Vector3 animatedBallShotDirection;
 	Animator anim;
+	Coroutine puttsOverlayEnumerator;
+	Coroutine backgroundTransitionEnumerator;
 
 	public bool isFocused { get; set; }
 
@@ -42,7 +44,8 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		animatedBackground = GameObject.Find ("Background");
 		if (animatedBackground != null) {
 			anim = animatedBackground.GetComponent<Animator> ();
-			reverseBackgroundTransition ();
+			//anim ["PlayAnimation"].speed = 0;
+			//anim ["PlayAnimation"]. = 0;
 		}
 	}
 	
@@ -50,8 +53,10 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 	void Update ()
 	{
 		if (isFocused && !isInitialized) {
-			StartCoroutine (playBackgroundTransition ());
+			backgroundTransitionEnumerator = StartCoroutine (playBackgroundTransition ());
 		} else if (!isFocused && isInitialized) {
+			StopCoroutine (puttsOverlayEnumerator);
+			StopCoroutine (backgroundTransitionEnumerator);
 			reverseBackgroundTransition ();
 		}
 	}
@@ -62,22 +67,32 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		isInitialized = true;
 		anim.Play ("PlayAnimation");
 		yield return new WaitForSeconds (1.9f);
-		StartCoroutine (TogglePuttsOverlay ());
-		if (animatedBall != null) {
-			animatedBall.SetActive (true);
-			animatedBall.transform.position = animatedBallDefaultVector;
-			animatedBall.transform.GetComponent<Rigidbody> ().AddForce (animatedBallShotDirection * 499f, ForceMode.Acceleration);
-		}
+		if (isFocused) {
+			puttsOverlayEnumerator = StartCoroutine (TogglePuttsOverlay ());
+			if (animatedBall != null) {
+				animatedBall.SetActive (true);
+				Rigidbody ballBody = animatedBall.transform.GetComponent<Rigidbody> ();
+				if (ballBody.velocity == Vector3.zero) {
+					animatedBall.transform.position = animatedBallDefaultVector;
+					animatedBall.transform.GetComponent<Rigidbody> ().AddForce (animatedBallShotDirection * 499f, ForceMode.Acceleration);
+				}
+			}
+		} 
 	}
 
 	public void reverseBackgroundTransition ()
 	{
 		Debug.Log ("reverseBackgroundTransition()");
 		isInitialized = false;
-		StartCoroutine (TogglePuttsOverlay ());
+		puttsOverlay.SetActive (false);
+		//anim ["PlayAnimation"].speed = 0;
+
 		anim.Play ("ReverseAnimation");
 		if (animatedBall != null) {
 			animatedBall.transform.position.Equals (animatedBallDefaultVector);
+			Rigidbody ballBody = animatedBall.transform.GetComponent<Rigidbody> ();
+			ballBody.velocity = Vector3.zero;
+			ballBody.angularVelocity = Vector3.zero;
 			animatedBall.SetActive (false);
 		}
 	}
@@ -92,7 +107,7 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 	public void MockInitialize ()
 	{
 		// This must be called by external platform. Pass JSON.
-		//Initialize(getMockJSON());
+		// Initialize(getMockJSON());
 	}
 
 	public void Initialize (String json)

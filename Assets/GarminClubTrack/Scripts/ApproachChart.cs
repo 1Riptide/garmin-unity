@@ -8,29 +8,18 @@ using UnityEngine.UI;
 
 public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 {
-	enum LieTypes
-	{
-		Unknown,
-		Teebox,
-		Rough,
-		Bunker,
-		Fairway,
-		Green,
-		Waste
-	};
-
 	private string defaultPercentage = "--";
 	// Default shot object.
 	public GameObject whiteDataPoint;
 	public GameObject redDataPoint;
 	public GameObject chartGameObject;
+	public GameObject scatterChartGameObject;
 	public static GameObject[] dataPoints;
 
 	public bool isFocused { get; set; }
 	// is user looking here?
 	public bool isDefaultState { get; set; }
-	// assuming chart has multiples. Can be anything.
-
+	// Hide these GameObjects when clubTrack flag is missing or false. (user does not have feature).
 	public GameObject hide4NonClubTrack;
 	// Approach Shots in green percentage text objs.
 	public GameObject hitGreenText;
@@ -43,13 +32,6 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 	public GameObject missedGreenLeftText;
 	public GameObject missedGreenRightText;
 
-	// Use this for initialization
-	void Start ()
-	{
-		isDefaultState = true;
-		MockInitialize ();	
-	}
-
 	public void MockInitialize ()
 	{
 		// This must be called by external platform. Pass JSON.
@@ -59,13 +41,13 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 	public void Initialize (String json)
 	{
 		if (json == null || json.Length == 0) {
-			Debug.Log ("Exception calling AddDataPoints : ");
+			Debug.Log ("ApproachChart Initialize : json problems...Calling Initialize() : looks like json is empty? json = \n" + json);
 		} else {
 			try {
-				Debug.Log ("Initialize() json is not null. Casting to JSON obj...");
 				UpdateApproachStats (json);
+				scatterChartGameObject.GetComponent<ApproachChartWithShots> ().Initialize(json);
 			} catch (Exception e) {
-				Debug.Log ("Exception parsing JSON : " + e);
+				Debug.Log ("ApproachChart Exception parsing JSON : " + e);
 			}
 		}
 	}
@@ -75,7 +57,7 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 		var clubTrackApproachData = JSON.Parse (json);
 		bool usingClubTrack = clubTrackApproachData ["usingClubtrack"];
 
-		Debug.Log ("UpdateApproachStats - json = \n" + usingClubTrack);
+		Debug.Log ("ApproachChart UpdateApproachStats - json = \n" + usingClubTrack);
 		// Hit Green Percentages
 		TextMesh percentHitGreen10 = hitGreenText.GetComponent<TextMesh> ();
 		TextMesh percentHitGreen20 = middleOfGreenText.GetComponent<TextMesh> ();
@@ -112,8 +94,7 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 		missedGreenRight.text = (rightOfGreenPercent != null && rightOfGreenPercent != "0") ? rightOfGreenPercent + "%" : defaultPercentage + "%"; 
 
 	}
-
-
+		
 	/** Approach GCS Contract as of 1/24/18
 	 {
 		  "numberOfRounds": 0,
@@ -155,7 +136,7 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 
 		"  \"percentLongOfGreen\": 0,\n" + "  \"percentLeftOfGreen\": 0,\n" + "  \"percentRightOfGreen\": 0,\n" +
 
-		"  \"percentGreenInRegulation\": 0,\n" + "  \"shotOrientationDetail\": [\n" + "    {\n" + "      \"remainingDistance\": 50,\n" +
+			"  \"percentGreenInRegulation\": 0,\n" + "  \"shotOrientationDetail\": [\n" + "    {\n" + "      \"remainingDistance\": 50,\n" +
 
 		"      \"startingDistanceToHole\": 95,\n" + "      \"offsetAngle\": 20,\n" + "      \"shotId\": 0,\n" +
 

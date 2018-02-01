@@ -5,14 +5,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using SimpleJSON;
 
-public class ChippingChart : ShotChart, IGarmin3DChart {
-
-	public bool isFocused {get; set;}
+public class ChippingChart : RadialShotChart, IGarmin3DChart {
 
 	// Testing only.
 	public void MockInitialize ()
 	{
-		// This must be called by external platform. Pass JSON.
 		Initialize (getMockJSON ());
 	}
 
@@ -34,7 +31,7 @@ public class ChippingChart : ShotChart, IGarmin3DChart {
 	IEnumerator AddDataPoints (String json)
 	{
 		var clubTrackApproachData = JSON.Parse (json);
-		var shotData = clubTrackApproachData ["shotOrientationDetails"];
+		var shotData = clubTrackApproachData ["shotOrientationDetail"];
 		var shotCount = shotData.Count;
 		dataPoints = new GameObject[shotCount];
 		Debug.Log ("AddDataPoints shotData count  " + shotCount);
@@ -42,7 +39,7 @@ public class ChippingChart : ShotChart, IGarmin3DChart {
 		// Origin of datapoint creation
 		Vector3 origin = chartGameObject.transform.position;
 		// Log of distances
-		float[] shotDistanceLog = createDistanceLog (clubTrackApproachData, "shotOrientationDetails");
+		float[] shotDistanceLog = createDistanceLog (clubTrackApproachData, "shotOrientationDetail", "remainingDistance");
 		// Outter band of Dartbord scale is 21 x 21.
 		// Outter max is 33 x 33
 		var maxValue = shotDistanceLog.Max ();
@@ -67,7 +64,7 @@ public class ChippingChart : ShotChart, IGarmin3DChart {
 			if (!lieType.Equals (LieTypes.Green.ToString ())) {
 				// Miss range is [21 - 39]
 				// Red
-				clone = AddDataPoint (missDataPointPrefab, newPosition);
+				//clone = AddDataPoint (missDataPointPrefab, newPosition);
 
 			} else {
 
@@ -91,7 +88,7 @@ public class ChippingChart : ShotChart, IGarmin3DChart {
 	{
 		return "{\n" + "\"numberOfRounds\": 10,\n" + "\"percentHitGreen10\": 40,\n" + "\"percentHitGreen20\": 20,\n" +
 			"\"percentHitGreen20Plus\": 40,\n" + "\"percentUpDown\": 25,\n" + "\"percentSandies\": 0,\n" +
-			"\"shotOrientationDetails\": [\n" + "{\n" + "\"remainingDistance\": 2.07,\n" + "\"startingDistanceToHole\": 17.6,\n" +
+			"\"shotOrientationDetail\": [\n" + "{\n" + "\"remainingDistance\": 2.07,\n" + "\"startingDistanceToHole\": 17.6,\n" +
 			"\"offsetAngle\": 137.8,\n" + "\"shotId\": 1,\n" + "\"clubId\": 52600,\n" + "\"scorecardId\": 5678,\n" +
 			"\"holeNumber\": 1,\n" + "\"startingLieType\": \"Fairway\",\n" + "\"endingLieType\": \"Green\",\n" +
 			"\"onePuttAfter\": true\n" + "},\n" + "{\n" + "\"remainingDistance\": 0.89,\n" + "\"startingDistanceToHole\": 3.4,\n" +
