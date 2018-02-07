@@ -44,8 +44,6 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		animatedBackground = GameObject.Find ("Background");
 		if (animatedBackground != null) {
 			anim = animatedBackground.GetComponent<Animator> ();
-			//anim ["PlayAnimation"].speed = 0;
-			//anim ["PlayAnimation"]. = 0;
 		}
 	}
 	
@@ -55,8 +53,12 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		if (isFocused && !isInitialized) {
 			backgroundTransitionEnumerator = StartCoroutine (playBackgroundTransition ());
 		} else if (!isFocused && isInitialized) {
-			StopCoroutine (puttsOverlayEnumerator);
-			StopCoroutine (backgroundTransitionEnumerator);
+			if (puttsOverlayEnumerator != null) {
+				StopCoroutine (puttsOverlayEnumerator);
+			}
+			if (backgroundTransitionEnumerator != null) {
+				StopCoroutine (backgroundTransitionEnumerator);
+			}
 			reverseBackgroundTransition ();
 		}
 	}

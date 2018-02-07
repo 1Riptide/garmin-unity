@@ -6,9 +6,7 @@ using SimpleJSON;
 
 public class DriveChart : MonoBehaviour, IGarmin3DChart
 {
-
 	public bool isFocused { get; set; }
-	//enum ShotOutcomes {HIT, LEFT, RIGHT, NO_FAIRWAY};
 	// Default shot object.
 	public GameObject whiteDataPoint;
 	public GameObject redDataPoint;
@@ -53,7 +51,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		maxDistanceMarker.SetActive (false);
 		minDistanceMarker.SetActive (false);
 		avgDistanceMarker.SetActive (false);
-		//MockInitialize ();
 	}
 
 	public void MockInitialize ()

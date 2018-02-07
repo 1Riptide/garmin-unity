@@ -22,7 +22,6 @@ public class RadialShotChart : MonoBehaviour
 	public GameObject hitDataPointPrefab;
 	public GameObject missDataPointPrefab;
 	protected GameObject[] dataPoints;
-	private Vector3 origin;
 	public bool isFocused { get; set; }
 
 	public void Cleanup ()
@@ -37,7 +36,7 @@ public class RadialShotChart : MonoBehaviour
 	public GameObject AddDataPoint (GameObject dataPoint, Vector3 location)
 	{
 		Debug.Log ("AddDataPoint : location.x = " + location.x + "  -  location.y = " + location.y);
-		return Instantiate (dataPoint, origin + location, Quaternion.identity);
+		return Instantiate (dataPoint, location, Quaternion.identity);
 	}
 
 	public float[] createDistanceLog (JSONNode data, String nodeName, String propertyName)

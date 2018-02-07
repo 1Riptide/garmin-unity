@@ -3905,7 +3905,7 @@ TextMesh:
   m_GameObject: {fileID: 917516438}
   m_Text: 2%
   m_OffsetZ: 0
-  m_CharacterSize: 50
+  m_CharacterSize: 45
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 1
@@ -5863,7 +5863,7 @@ TextMesh:
   m_GameObject: {fileID: 1270595963}
   m_Text: 6%
   m_OffsetZ: 0
-  m_CharacterSize: 50
+  m_CharacterSize: 45
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 1
@@ -7850,7 +7850,7 @@ TextMesh:
   m_GameObject: {fileID: 1616844820}
   m_Text: 10%
   m_OffsetZ: 0
-  m_CharacterSize: 50
+  m_CharacterSize: 45
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 1
@@ -9305,7 +9305,7 @@ TextMesh:
   m_GameObject: {fileID: 1977342450}
   m_Text: 50%
   m_OffsetZ: 0
-  m_CharacterSize: 50
+  m_CharacterSize: 45
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 1
