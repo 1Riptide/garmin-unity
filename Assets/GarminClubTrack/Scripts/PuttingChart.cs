@@ -44,8 +44,6 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		animatedBackground = GameObject.Find ("Background");
 		if (animatedBackground != null) {
 			anim = animatedBackground.GetComponent<Animator> ();
-			//anim ["PlayAnimation"].speed = 0;
-			//anim ["PlayAnimation"]. = 0;
 		}
 	}
 	

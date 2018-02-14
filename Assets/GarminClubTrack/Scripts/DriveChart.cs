@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
@@ -8,7 +9,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 {
 
 	public bool isFocused { get; set; }
-	//enum ShotOutcomes {HIT, LEFT, RIGHT, NO_FAIRWAY};
 	// Default shot object.
 	public GameObject whiteDataPoint;
 	public GameObject redDataPoint;
@@ -27,9 +27,9 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	float avgShotZOnChart;
 	float maxShotZOnChart;
 	float minShotZOnChart;
-	int maxShotDistanceOnChart = -1;
-	int avgShotDistanceOnChart = -1;
-	int minShotDistanceOnChart = -1;
+	float maxShotDistanceOnChart = -1f;
+	float avgShotDistanceOnChart = -1f;
+	float minShotDistanceOnChart = -1f;
 
 	Vector3 longestShotVector;
 	Vector3 averageShotVector;
@@ -43,6 +43,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	int minY;
 	int avgY;
 	float transitionSpeed = .8f;
+	private static bool isTightRange = false; //Are all shots within 10 yards/meters?
 
 	// Genesis
 	void Start ()
@@ -53,7 +54,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		maxDistanceMarker.SetActive (false);
 		minDistanceMarker.SetActive (false);
 		avgDistanceMarker.SetActive (false);
-		//MockInitialize ();
 	}
 
 	public void MockInitialize ()
@@ -67,40 +67,15 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	void Update ()
 	{
 		if (isFocused == true) {
-			avgDistanceMarker.transform.position = Vector3.Lerp (avgDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);	
-			minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
-			maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
-		}
-	}
-
-	IEnumerator AddDataPoints ()
-	{
-		Debug.Log ("AddDataPoints no args");
-		int shotCount = 87;
-		float[] shotDistanceLog = new float[shotCount];
-		// Since we are plotting shots in 2D space (on a plane), we dont need to keep calculating in loop below.
-		float verticalPosition = 0f;
-		// Plot the shots.
-		for (int i = 0; i < shotCount; i++) {
-			float lateralPosition = UnityEngine.Random.Range (-9.0f, 9.0f);
-			float distance = UnityEngine.Random.Range (-14.0f, 14.0f);
-			shotDistanceLog [i] = distance;
-			// continually calculate these values(for animation).
-			avgShotZOnChart = GetMedian (shotDistanceLog);
-			maxShotZOnChart = distance > maxShotZOnChart ? distance : maxShotZOnChart;
-			if (i == 0) {
-				minShotZOnChart = distance;
-			} else {
-				minShotZOnChart = distance < minShotZOnChart ? distance : minShotZOnChart;
+			if (avgDistanceMarker.activeSelf.Equals (true)) {
+				avgDistanceMarker.transform.position = Vector3.Lerp (avgDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);
 			}
-			// Update shot vectors. Used to animate shot markers.
-			longestShotVector = new Vector3 (0, 0, maxShotZOnChart);
-			averageShotVector = new Vector3 (0, 0, avgShotZOnChart);
-			shortestShotVector = new Vector3 (0, 0, minShotZOnChart);
 
-			dataPoints.Push (AddDataPoint (whiteDataPoint, new Vector3 (lateralPosition, verticalPosition, distance)));
-			// Stall the loop for aesthetics as shots drop.
-			yield return new WaitForSeconds (.5f);
+			if (minDistanceMarker.activeSelf.Equals (true)) {
+				minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
+			}
+
+			maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
 		}
 	}
 
@@ -135,7 +110,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		 */ 
 
 		float negativeZOffset = Math.Abs (zMinBounds);
-		float negativeXOffset = Math.Abs (xMinBounds);
+		float lateralOffset = Math.Abs (xMinBounds);
 
 		// Log of Z Positions
 		float[] shotDistanceZLog = new float[shotCount];
@@ -145,81 +120,101 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		// Since we are plotting shots in 2D space (on a plane), we dont need to keep calculating in loop below.
 		float verticalPosition = 0f;
 	
+		// As long as we have one shot we will have a maxDistance Marker.
+		maxDistanceMarker.SetActive (true);
+		// As long as there are at least 2 shots, there is also a minDistance Marker.
+		if (shotCount > 1) {
+			minDistanceMarker.SetActive (true);
+		}
+		// Unless there are at least 4 shots, do not show 75% marker (formerly Avg Marker).
+		if (shotCount > 3) {
+			avgDistanceMarker.SetActive (true);
+		}
+			
 		// Plot the shots.
 		for (int i = 0; i < shotCount; i++) {
-			
 			JSONNode shotDetail = shotData [i];
-			//Debug.Log ("shotDetail = " + shotDetail.ToString () + " count = " + i);
 			if (shotDetail != null) {
 				float distance = shotDetail ["shotDistance"];
-
-				if (maxShotDistanceOnChart != -1) {
-					if (maxShotDistanceOnChart < distance) {
-						maxShotDistanceOnChart = (int)distance;
-					}	
-				} else {
-					maxShotDistanceOnChart = (int)distance;
-				}
-
-				if (minShotDistanceOnChart != -1) {
-					if (minShotDistanceOnChart > distance) {
-						minShotDistanceOnChart = (int)distance;
-					}
-				} else {
-					minShotDistanceOnChart = (int)distance;
-				}
 
 				// Bottom(min) to Top(max)
 				float offsetDistance = distance + negativeZOffset;
 				float distanceRatio = offsetDistance / (maxDistance + negativeZOffset);
-				float ZPositon = (distanceRatio * (zMaxBounds + negativeZOffset)) - negativeZOffset;
 
-				// Keep track so we can know averages
-				shotDistanceZLog [i] = ZPositon;
-				shotDistanceLog [i] = distance;
+				shotDistanceLog [i] = distance; // Real world distance log
+
 				// continually calculate these values(for animation).
-				avgShotZOnChart = GetMedian (shotDistanceZLog);
-				avgShotDistanceOnChart = (int)GetMedian (shotDistanceLog);
+				if (avgDistanceMarker.activeSelf.Equals (true)) {
+					avgShotZOnChart = Get75th (shotDistanceZLog);
+					avgShotDistanceOnChart = Get75th (shotDistanceLog);
+					averageShotVector = new Vector3 (0, 0, avgShotZOnChart);
+					averageText.text = Math.Round(avgShotDistanceOnChart).ToString ();
+				}
 
+				float ZPositon;
+				if (isTightRange.Equals(true)) {
+					Debug.Log ("###  IS TIGHT RANGE!");
+					distanceRatio = distance / (maxDistance);
+					ZPositon = (distanceRatio * zMaxBounds) - negativeZOffset;
+					
+				} else {
+					Debug.Log ("###  IS NOT TIGHT RANGE!");
+					ZPositon = (distanceRatio * (zMaxBounds + negativeZOffset)) - negativeZOffset;
+				}
+				// Keep track so we can know averages
+				shotDistanceZLog [i] = ZPositon; // Position in 2D space log
 				maxShotZOnChart = maxShotZOnChart != null ? (ZPositon > maxShotZOnChart) ? ZPositon : maxShotZOnChart : ZPositon;
 
-				if (i == 0) {
-					minShotZOnChart = ZPositon;
+
+				if (maxShotDistanceOnChart != -1) {
+					if (maxShotDistanceOnChart < distance) {
+						maxShotDistanceOnChart = distance;
+					}	
 				} else {
-					minShotZOnChart = ZPositon < minShotZOnChart ? ZPositon : minShotZOnChart;
+					maxShotDistanceOnChart = distance;
+				}
+
+				if (minDistanceMarker.activeSelf.Equals (true)) {
+					if (minShotDistanceOnChart != -1) {
+						if (minShotDistanceOnChart > distance) {
+							minShotDistanceOnChart = distance;
+						}
+					} else {
+						minShotDistanceOnChart = distance;
+					}
+					minText.text = Math.Round(minShotDistanceOnChart).ToString ();
+					if (i == 0) {
+						minShotZOnChart = ZPositon;
+					} else {
+						minShotZOnChart = ZPositon < minShotZOnChart ? ZPositon : minShotZOnChart;
+					}
+					shortestShotVector = new Vector3 (0, 0, minShotZOnChart);
 				}
 
 				// Left(min) to Right(max)
 				float lateralDistance = shotDetail ["dispersionDistance"];
-				float offsetLateralDistance = lateralDistance + negativeXOffset;
-				float lateralRatio = offsetLateralDistance / (maxLateralDistance + negativeXOffset);
-				float XPosition = (lateralRatio * (xMaxBounds + negativeXOffset)) - negativeXOffset;
-
+				float XPosition = 0f;
 				// Update shot vectors. Used to animate shot markers.
 				longestShotVector = new Vector3 (0, 0, maxShotZOnChart);
-				averageShotVector = new Vector3 (0, 0, avgShotZOnChart);
-				shortestShotVector = new Vector3 (0, 0, minShotZOnChart);
-				/**
-					 * Squeeze all shots into available lateral space. Shots that are out of range 
-					 * will stick to the outside edge of the plane on either the right or left side.
-					 */ 
-				if (XPosition > xMaxBounds) {
-					XPosition = xMaxBounds + 1f;
-					dataPoints.Push (AddDataPoint (redDataPoint, new Vector3 (XPosition, verticalPosition, ZPositon)));
-				} else if (XPosition < xMinBounds) {
-					XPosition = xMinBounds - 1f;
-					dataPoints.Push (AddDataPoint (redDataPoint, new Vector3 (XPosition, verticalPosition, ZPositon)));
-				} else {
+				XPosition = lateralDistance / 6;
+				if (lateralDistance < 60f && lateralDistance > -60f) {
 					dataPoints.Push (AddDataPoint (whiteDataPoint, new Vector3 (XPosition, verticalPosition, ZPositon)));
+				} else {
+					// too far right. Stick to edge.
+					if (XPosition > xMaxBounds) {
+						XPosition = xMaxBounds + 1f;
+						dataPoints.Push (AddDataPoint (redDataPoint, new Vector3 (XPosition, verticalPosition, ZPositon)));
+					} else if (XPosition < xMinBounds) {
+					// too far left. Stick to edge.
+						XPosition = xMinBounds - 1f;
+						dataPoints.Push (AddDataPoint (redDataPoint, new Vector3 (XPosition, verticalPosition, ZPositon)));
+					}
 				}
-
-				// Update markers
-				maxText.text = maxShotDistanceOnChart.ToString ();
-				averageText.text = avgShotDistanceOnChart.ToString ();
-				minText.text = minShotDistanceOnChart.ToString ();
+					
+				// Update max text
+				maxText.text = Math.Round(maxShotDistanceOnChart).ToString ();
 			} else {
 				Debug.Log ("AddDataPoints ShotData is null! = " + shotData);
-
 			}
 			// Stall the loop for aesthetics as shots drop.
 			yield return new WaitForSeconds (0);
@@ -246,6 +241,34 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		int mid = size / 2;
 		float median = (size % 2 != 0) ? (float)sortedPNumbers [mid] : ((float)sortedPNumbers [mid] + (float)sortedPNumbers [mid - 1]) / 2;
 		return median;
+	}
+
+	/**
+	 * return 75th percentile of a collection of numbers
+	 */
+	static float Get75th (float[] sourceNumbers)
+	{
+		Debug.Log("Get75TH ");
+		int length = sourceNumbers.Length;
+		//Framework 2.0 version of this method. there is an easier way in F4        
+		if (sourceNumbers == null || length == 0)
+			throw new System.Exception ("Get75th of empty array not defined.");
+
+		List<float> floatingList = new List<float> (sourceNumbers);
+		float upper = floatingList.Max ();
+
+		if (length == 1) {
+			isTightRange = false;
+			return upper;
+		} else {
+			float dec = .75f;
+			float lower = floatingList.Min ();
+			// Keep track if we are working with a tightly grouped collection of shots. Scale as appropriate.
+			Debug.Log ("upper-lower = " + (upper - lower));
+			isTightRange = (upper - lower) <= 10;
+			float diff = upper - lower;
+			return lower + (dec * diff);
+		}
 	}
 
 	void Cleanup ()
@@ -276,9 +299,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 		} else {
 			try {
 				Debug.Log ("Initialize() json is not null. Casting to JSON obj...");
-				maxDistanceMarker.SetActive (true);
-				minDistanceMarker.SetActive (true);
-				avgDistanceMarker.SetActive (true);
 				StartCoroutine (AddDataPoints (json));
 			} catch (Exception e) {
 				Debug.Log ("Exception parsing JSON : " + e);
@@ -288,53 +308,65 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 
 	String getMockJSON ()
 	{
-		return "{\n" + "  \"numberOfRounds\": 0,\n" + "  \"percentFairwayLeft\": 0,\n" + "  \"percentFairwayRight\": 0,\n" +
-		"  \"percentFairwayHit\": 0,\n" + "  \"minShotDistance\": 30,\n" + "  \"maxShotDistance\": 263,\n" +
-		"  \"avgShotDistance\": 0,\n" + "  \"minDispersionDistance\": 2,\n" + "  \"maxDispersionDistance\": 80,\n" +
-		"  \"shotDispersionDetails\": [\n" + "    {\n" + "      \"shotId\": 0,\n" + "      \"scorecardId\": 0,\n" +
-		"      \"holeNumber\": 2,\n" + "      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53856,\n" +
-		"      \"dispersionDistance\": 80,\n" + "      \"shotDistance\": 190,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" +
-		"    },\n" + "    {\n" + "      \"shotId\": 1,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 3,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53843,\n" + "      \"dispersionDistance\": 200,\n" +
-		"      \"shotDistance\": 30,\n" + "      \"fairwayShotOutcome\": \"RIGHT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 2,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 4,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53856,\n" + "      \"dispersionDistance\": 10,\n" +
-		"      \"shotDistance\": 263,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 3,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 5,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53846,\n" + "      \"dispersionDistance\": 40,\n" +
-		"      \"shotDistance\": 250,\n" + "      \"fairwayShotOutcome\": \"NO_FAIRWAY\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 4,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 6,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53844,\n" + "      \"dispersionDistance\": -80,\n" +
-		"      \"shotDistance\": 172,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 5,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 7,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53857,\n" + "      \"dispersionDistance\": 10,\n" +
-		"      \"shotDistance\": 209,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 6,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 10,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53843,\n" + "      \"dispersionDistance\": 6,\n" +
-		"      \"shotDistance\": 194,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 7,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 11,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53856,\n" + "      \"dispersionDistance\": 60,\n" +
-		"      \"shotDistance\": 230,\n" + "      \"fairwayShotOutcome\": \"LEFT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 8,\n" + "      \"scorecardId\": 0,\n" + "      \"holeNumber\": 17,\n" +
-		"      \"shotTime\": \"2017-12-07\",\n" + "      \"clubId\": 53857,\n" + "      \"dispersionDistance\": 4,\n" +
-		"      \"shotDistance\": 231,\n" + "      \"fairwayShotOutcome\": \"HIT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 9,\n" + "      \"scorecardId\": 1,\n" + "      \"holeNumber\": 3,\n" +
-		"      \"shotTime\": \"2017-12-08\",\n" + "      \"clubId\": 53856,\n" + "      \"dispersionDistance\": 60,\n" +
-		"      \"shotDistance\": 73,\n" + "      \"fairwayShotOutcome\": \"NO_FAIRWAY\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 10,\n" + "      \"scorecardId\": 1,\n" + "      \"holeNumber\": 4,\n" +
-		"      \"shotTime\": \"2017-12-08\",\n" + "      \"clubId\": 53857,\n" + "      \"dispersionDistance\": 40,\n" +
-		"      \"shotDistance\": 204,\n" + "      \"fairwayShotOutcome\": \"LEFT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 16,\n" + "      \"scorecardId\": 1,\n" + "      \"holeNumber\": 6,\n" +
-		"      \"shotTime\": \"2017-12-08\",\n" + "      \"clubId\": 53843,\n" + "      \"dispersionDistance\": 20,\n" +
-		"      \"shotDistance\": 243,\n" + "      \"fairwayShotOutcome\": \"RIGHT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 17,\n" + "      \"scorecardId\": 2,\n" + "      \"holeNumber\": 1,\n" +
-		"      \"shotTime\": \"2017-12-09\",\n" + "      \"clubId\": 53856,\n" + "      \"dispersionDistance\": 50,\n" +
-		"      \"shotDistance\": 174,\n" + "      \"fairwayShotOutcome\": \"NO_FAIRWAY\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 17,\n" + "      \"scorecardId\": 2,\n" + "      \"holeNumber\": 2,\n" +
-		"      \"shotTime\": \"2017-12-09\",\n" + "      \"clubId\": 53843,\n" + "      \"dispersionDistance\": 12,\n" +
-		"      \"shotDistance\": 221,\n" + "      \"fairwayShotOutcome\": \"RIGHT\"\n" + "    },\n" + "    {\n" +
-		"      \"shotId\": 18,\n" + "      \"scorecardId\": 2,\n" + "      \"holeNumber\": 4,\n" +
-		"      \"shotTime\": \"2017-12-09\",\n" + "      \"clubId\": 53859,\n" + "      \"dispersionDistance\": -111,\n" +
-		"      \"shotDistance\": 30,\n" + "      \"fairwayShotOutcome\": \"LEFT\"\n" + "    }\n" + "  ]\n" + "}";
+		return "{\n \"numberOfRounds\": 1,\n    \"percentFairwayLeft\": 22.73,\n    \"percentFairwayRight\": 18.18,\n    \"percentFairwayHit\": 59.09,\n    \"minShotDistance\": 175.407,\n    \"maxShotDistance\": 198.445,\n    \"avgShotDistance\": 0,\n    \"minDispersionDistance\": -2.58,\n    \"maxDispersionDistance\": 18.7,\n    \"longestShot\": {\n        \"holeShot\": {\n            \"holeNumber\": 5,\n            \"holeImageUrl\": \"http://birdseye.garmin.com/birdseye/golf/006-d1399-24/gd24500/gid024587/006-d1399-24/0/hole5.jpg?garmindlm=1550009738_084a1ffe5a753390e487a8aa04274cf0\",\n            \"pinPosition\": {\n                \"x\": 413,\n                \"y\": 69\n            },\n            \"shots\": [\n                {\n                    \"id\": 64610,\n                    \"scorecardId\": 17126,\n                    \"playerProfileId\": 1643207,\n                    \"shotTime\": 1516106998000,\n                    \"shotTimeZoneOffset\": 0,\n                    \"clubId\": 0,\n                    \"holeNumber\": 5,\n                    \"autoShotType\": \"USED\",\n                    \"startLoc\": {\n                        \"x\": 360,\n                        \"y\": 725\n                    },\n                    \"endLoc\": {\n                        \"x\": 413,\n                        \"y\": 69\n                    },\n                    \"meters\": 525.804\n                }\n            ]\n        },\n        \"courseSnapshotId\": 1554,\n        \"courseName\": \"El Rompido Golf Club ~ Norte\"\n    },\n    \"shotDispersionDetails\": [\n        " +
+		"{\n " +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
+
+		"\"dispersionDistance\": -2.58,\n" +
+		"\"shotDistance\": 185.893,\n" +
+
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
+		"{\n " +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
+
+		"\"dispersionDistance\": -62.58,\n" +
+		"\"shotDistance\": 189.893,\n" +
+
+		"\"fairwayShotOutcome\": \"LEFT\"\n" +
+		"}," +
+
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
+
+		"\"dispersionDistance\": -45.81,\n" +
+		"\"shotDistance\": 0.9,\n" +
+
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"},"+
+
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
+
+		"\"dispersionDistance\": 5.81,\n" +
+		"\"shotDistance\": 194.457,\n" +
+
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
+		"{\n \"shotId\": 65182,\n" +
+		"\"scorecardId\": 17147,\n" +
+		"\"holeNumber\": 1,\n" +
+		"\"shotTime\": \"2018-01-16T20:50:25.000Z\",\n" +
+		"\"clubId\": 56868,\n" +
+
+		"\"dispersionDistance\": 18.7,\n" +
+		"\"shotDistance\": 194.445,\n" +
+
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}" + "]\n}";
 	}
 }
