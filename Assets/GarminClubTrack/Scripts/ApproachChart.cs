@@ -32,6 +32,10 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 	public GameObject missedGreenLeftText;
 	public GameObject missedGreenRightText;
 
+	// Formatting
+	private string floatFormat = "#.00";
+	private string precisionPattern = ".00";
+
 	public void MockInitialize ()
 	{
 		// This must be called by external platform. Pass JSON.
@@ -70,28 +74,41 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 		TextMesh missedGreenRight = missedGreenRightText.GetComponent<TextMesh> ();
 
 		if (usingClubTrack) {
-			var hitGreen10Percent = clubTrackApproachData ["percentHitGreen10"];
-			var hitGreen20Percent = clubTrackApproachData ["percentHitGreen20"];
-			var hitGreen20PlusPercent = clubTrackApproachData ["percentHitGreen20Plus"];
+			float hitGreen10Percent = clubTrackApproachData ["percentHitGreen10"];
+			float hitGreen20Percent = clubTrackApproachData ["percentHitGreen20"];
+			float hitGreen20PlusPercent = clubTrackApproachData ["percentHitGreen20Plus"];
 
-			percentHitGreen10.text = (hitGreen10Percent != null && hitGreen10Percent != "0") ? hitGreen10Percent + "%" : defaultPercentage + "%";
-			percentHitGreen20.text = (hitGreen20Percent != null && hitGreen20Percent != "0") ? hitGreen20Percent + "%" : defaultPercentage + "%";
-			percentHitGreen30.text = (hitGreen20PlusPercent != null && hitGreen20PlusPercent != "0") ? hitGreen20PlusPercent + "%" : defaultPercentage + "%";
+			var hitGreen10PercentStr = hitGreen10Percent.ToString(floatFormat);
+			var hitGreen20PercentStr = hitGreen20Percent.ToString(floatFormat);
+			var hitGreen20PlusPercentStr = hitGreen20PlusPercent.ToString(floatFormat);
+
+			percentHitGreen10.text = (hitGreen10Percent != null && hitGreen10PercentStr != precisionPattern) ? hitGreen10PercentStr + "%" : defaultPercentage + "%";
+			percentHitGreen20.text = (hitGreen20Percent != null && hitGreen20PercentStr != precisionPattern) ? hitGreen20PercentStr + "%" : defaultPercentage + "%";
+			percentHitGreen30.text = (hitGreen20PlusPercent != null && hitGreen20PlusPercentStr != precisionPattern) ? hitGreen20PlusPercentStr + "%" : defaultPercentage + "%";
 
 		} else {
 			hide4NonClubTrack.SetActive (false);
-			var hitGreenPercent = clubTrackApproachData ["percentHitGreen"];
-			percentHitGreen10.text = (hitGreenPercent != null && hitGreenPercent != "0") ? hitGreenPercent + "%" : defaultPercentage + "%";
-		}
-		var shortOfGreenPercent = clubTrackApproachData ["percentShortOfGreen"];
-		var longOfGreenPercent = clubTrackApproachData ["percentLongOfGreen"];
-		var leftOfGreenPercent = clubTrackApproachData ["percentLeftOfGreen"];
-		var rightOfGreenPercent = clubTrackApproachData ["percentRightOfGreen"];
+			float hitGreenPercent = clubTrackApproachData ["percentHitGreen"];
+			var hitGreeenPercentStr = hitGreenPercent.ToString(floatFormat);
 
-		missedGreenShort.text = (shortOfGreenPercent != null && shortOfGreenPercent != "0") ? shortOfGreenPercent + "%" : defaultPercentage + "%";
-		missedGreenLong.text = (longOfGreenPercent != null && longOfGreenPercent != "0") ? longOfGreenPercent + "%" : defaultPercentage + "%";
-		missedGreenLeft.text = (leftOfGreenPercent != null && leftOfGreenPercent != "0") ? leftOfGreenPercent + "%" : defaultPercentage + "%"; 
-		missedGreenRight.text = (rightOfGreenPercent != null && rightOfGreenPercent != "0") ? rightOfGreenPercent + "%" : defaultPercentage + "%"; 
+			Debug.Log ("ApproachChart UpdateApproachStats - NO CLUB TRACK. percentHitGreen = " + hitGreenPercent);
+			percentHitGreen10.text = (hitGreenPercent != null && hitGreeenPercentStr != precisionPattern) ? hitGreeenPercentStr + "%" : defaultPercentage + "%";
+		}
+		float shortOfGreenPercent = clubTrackApproachData ["percentShortOfGreen"];
+		float longOfGreenPercent = clubTrackApproachData ["percentLongOfGreen"];
+		float leftOfGreenPercent = clubTrackApproachData ["percentLeftOfGreen"];
+		float rightOfGreenPercent = clubTrackApproachData ["percentRightOfGreen"];
+
+		var shortOfGreenPercentStr = shortOfGreenPercent.ToString(floatFormat);
+		var longOfGreenPercentStr = longOfGreenPercent.ToString(floatFormat);
+		var leftOfGreenPercentStr = leftOfGreenPercent.ToString(floatFormat);
+		var rightOfGreenPercentStr = rightOfGreenPercent.ToString(floatFormat);
+		Debug.Log ("ApproachChart UpdateApproachStats - " + longOfGreenPercentStr);
+
+		missedGreenShort.text = (shortOfGreenPercent != null && shortOfGreenPercentStr != precisionPattern) ? shortOfGreenPercentStr + "%" : defaultPercentage + "%";
+		missedGreenLong.text = (longOfGreenPercent != null && longOfGreenPercentStr != precisionPattern) ? longOfGreenPercentStr + "%" : defaultPercentage + "%";
+		missedGreenLeft.text = (leftOfGreenPercent != null && leftOfGreenPercentStr != precisionPattern) ? leftOfGreenPercentStr + "%" : defaultPercentage + "%"; 
+		missedGreenRight.text = (rightOfGreenPercent != null && rightOfGreenPercentStr != precisionPattern) ? rightOfGreenPercentStr + "%" : defaultPercentage + "%"; 
 
 	}
 		
@@ -130,11 +147,11 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 	String getMockJSON ()
 	{
 
-		return "{\n" + "  \"numberOfRounds\": 0,\n" + "  \"percentHitGreen10\": 0,\n" + "  \"percentHitGreen20\": 0,\n" +
+		return "{\n" + "  \"numberOfRounds\": 0,\n"+ "  \"percentHitGreen\": 20,\n"  + "  \"percentHitGreen10\": 0,\n" + "  \"percentHitGreen20\": 0,\n" +
 
-		"  \"percentHitGreen20Plus\": 0,\n" + "  \"percentMissedGreen\": 0,\n" + "  \"percentShortOfGreen\": 0,\n" +
+		"  \"percentHitGreen20Plus\": 10.333333,\n" + "  \"percentMissedGreen\": 0,\n" + "  \"percentShortOfGreen\": 0,\n" +
 
-		"  \"percentLongOfGreen\": 0,\n" + "  \"percentLeftOfGreen\": 0,\n" + "  \"percentRightOfGreen\": 0,\n" +
+		"  \"percentLongOfGreen\": 10.222222,\n" + "  \"percentLeftOfGreen\": 0,\n" + "  \"percentRightOfGreen\": 0,\n" +
 
 			"  \"percentGreenInRegulation\": 0,\n" + "  \"shotOrientationDetail\": [\n" + "    {\n" + "      \"remainingDistance\": 50,\n" +
 

@@ -7,7 +7,6 @@ using SimpleJSON;
 
 public class DriveChart : MonoBehaviour, IGarmin3DChart
 {
-
 	public bool isFocused { get; set; }
 	// Default shot object.
 	public GameObject whiteDataPoint;
