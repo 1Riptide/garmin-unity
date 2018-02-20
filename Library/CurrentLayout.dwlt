@@ -62,8 +62,8 @@ MonoBehaviour:
     y: 0
     width: 1241
     height: 782
-  m_MinSize: {x: 100, y: 122}
-  m_MaxSize: {x: 4000, y: 4022}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -91,7 +91,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 122}
   m_MaxSize: {x: 4000, y: 4022}
   vertical: 0
-  controlID: 178
+  controlID: 176
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_MinSize: {x: 277, y: 192}
   m_MaxSize: {x: 4002, y: 8042}
   vertical: 1
-  controlID: 145
+  controlID: 129
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -371,8 +371,8 @@ MonoBehaviour:
     y: 652
     width: 1307
     height: 333
-  m_MinSize: {x: 230, y: 250}
-  m_MaxSize: {x: 10000, y: 10000}
+  m_MinSize: {x: 232, y: 271}
+  m_MaxSize: {x: 10002, y: 10021}
   m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
@@ -451,7 +451,7 @@ MonoBehaviour:
   m_defaultScale: 1
   m_TargetTexture: {fileID: 0}
   m_CurrentColorSpace: 0
-  m_LastWindowPixelSize: {x: 1241, y: 760}
+  m_LastWindowPixelSize: {x: 2482, y: 1520}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000100000100
@@ -633,10 +633,10 @@ MonoBehaviour:
   m_LastProjectPath: /Users/stalnakerc/Projects/Unity3D/golf/garmin-unity-github
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 20360000
-    m_LastClickedID: 13856
-    m_ExpandedIDs: 000000004a29000004300000c83100000a320000ffffff7f
+    scrollPos: {x: 0, y: 31.992188}
+    m_SelectedIDs: 22360000
+    m_LastClickedID: 13858
+    m_ExpandedIDs: 000000004a29000006300000ca3100000c320000ffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -664,7 +664,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000004a290000b62c000004300000c8310000
+    m_ExpandedIDs: 000000004a29000006300000ca3100000c320000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -691,7 +691,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c623000016350000aa0600001a2e00001a32000074320000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -778,11 +778,11 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: -0.32535812, y: -0.024117751, z: 0.008301403, w: -0.9452469}
     speed: 2
-    m_Value: {x: -0.32535812, y: -0.024117751, z: 0.008301403, w: -0.9452469}
+    m_Value: {x: -0.32535812, y: -0.024117753, z: 0.008301403, w: -0.94524693}
   m_Size:
-    m_Target: 9.900275
+    m_Target: 11.400276
     speed: 2
-    m_Value: 9.900275
+    m_Value: 11.400276
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -822,9 +822,9 @@ MonoBehaviour:
     height: 631
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 6ea1ceff80a2ceffcaa4ceff667df4ff7a7ef4ffc480f4fff6c8f4ff08caf4ff52ccf4ff784af8ff8c4bf8ffd64df8ff3015f9ff3047f9ff4448f9ff8e4af9ff66f2ffffa6fbffff000000000a3f0000fe3f0000f0400000ecaf00004cb100005ab1000090b2000010e00000bae00000d0e20000103e010036580100e4580100205901002e590100fa5901004e5a0100
+    m_SelectedIDs: f4faffff
+    m_LastClickedID: -1292
+    m_ExpandedIDs: f8faffffa6fbffff000000007c3a0000ae3a0000003c00007a3c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

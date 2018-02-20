@@ -55,7 +55,7 @@ public class ApproachChartWithShots : RadialShotChart, IGarmin3DChart
 
 			// Create instance
 			GameObject clone;
-			if (!lieType.Equals (LieTypes.Green.ToString ())) {
+			if (!lieType.Equals (LieTypes.Green.ToString ()) && !lieType.Equals(LieTypes.Fairway.ToString())) {
 				// Miss range is [21 - 39]
 				// Red
 				clone = AddDataPoint (missDataPointPrefab, newPosition);
