@@ -54,7 +54,14 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 	void UpdateApproachStats (String json)
 	{
 		var clubTrackApproachData = JSON.Parse (json);
-		bool usingClubTrack = clubTrackApproachData ["usingClubtrack"].AsBool;
+
+		/** GOLFAPP-3147
+		 * Backstory: So now, instead of using property "usingClubtrack" to track if a user is using Clubtrack, 
+		 * we are now operating off of the property "percentHitGreen" to denote a non-Clubtrak user.
+		 */
+		//bool usingClubTrack = clubTrackApproachData ["usingClubtrack"].AsBool;
+		float hitGreenPercent = clubTrackApproachData ["percentHitGreen"];
+		bool usingClubTrack = hitGreenPercent == null;
 
 		Debug.Log ("ApproachChart UpdateApproachStats - json = \n" + usingClubTrack);
 		// Hit Green Percentages
@@ -83,7 +90,6 @@ public class ApproachChart : MonoBehaviour, IGarmin3DChart, IGarminNestedChart
 
 		} else {
 			hide4NonClubTrack.SetActive (false);
-			float hitGreenPercent = clubTrackApproachData ["percentHitGreen"];
 			var hitGreeenPercentStr = hitGreenPercent.ToString (GarminUtil.floatFormat);
 
 			Debug.Log ("ApproachChart UpdateApproachStats - NO CLUB TRACK. percentHitGreen = " + hitGreenPercent);
