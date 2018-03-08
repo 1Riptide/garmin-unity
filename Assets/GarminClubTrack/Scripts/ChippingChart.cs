@@ -50,9 +50,9 @@ public class ChippingChart : RadialShotChart, IGarmin3DChart {
 		float hitGreen20Percent = clubTrackChippingData ["percentHitGreen20"];
 		float hitGreen20PlusPercent = clubTrackChippingData ["percentHitGreen20Plus"];
 
-		var hitGreen10PercentStr = hitGreen10Percent.ToString (GarminUtil.floatFormat);
-		var hitGreen20PercentStr = hitGreen20Percent.ToString (GarminUtil.floatFormat);
-		var hitGreen20PlusPercentStr = hitGreen20PlusPercent.ToString (GarminUtil.floatFormat);
+		var hitGreen10PercentStr =  Mathf.Floor(hitGreen10Percent).ToString ();
+		var hitGreen20PercentStr = Mathf.Floor(hitGreen20Percent).ToString ();
+		var hitGreen20PlusPercentStr = Mathf.Floor(hitGreen20PlusPercent).ToString();
 
 		percentHitGreen10.text = (hitGreen10PercentStr != GarminUtil.precisionPattern) ? hitGreen10PercentStr + "%" : GarminUtil.defaultPercentage + "%";
 		percentHitGreen20.text = (hitGreen20PercentStr != GarminUtil.precisionPattern) ? hitGreen20PercentStr + "%" : GarminUtil.defaultPercentage + "%";
