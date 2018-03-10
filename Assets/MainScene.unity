@@ -3201,13 +3201,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 731395297}
-  m_LocalRotation: {x: 0.3907311, y: 0, z: 0, w: 0.9205049}
-  m_LocalPosition: {x: 0, y: 19, z: -24}
+  m_LocalRotation: {x: 0.4694715, y: 0, z: 0, w: 0.8829476}
+  m_LocalPosition: {x: 0, y: 20, z: -19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2072083251}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 46, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 56, y: 0, z: 0}
 --- !u!1 &807008550
 GameObject:
   m_ObjectHideFlags: 0
@@ -3970,7 +3970,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 916012756}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.2, z: 0}
+  m_LocalPosition: {x: 0, y: 0.25, z: 0}
   m_LocalScale: {x: 0.29999998, y: 1, z: 0.29999998}
   m_Children: []
   m_Father: {fileID: 94019270}
@@ -4676,13 +4676,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1061589320}
-  m_LocalRotation: {x: 0.14780942, y: 0, z: 0, w: 0.9890159}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 35, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 17, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1061589326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4700,6 +4700,7 @@ MonoBehaviour:
   chippingScene: {fileID: 691147295}
   puttingScene: {fileID: 1600423286}
   cameraTransitionSpeed: 0.7
+  isIntroTransitioning: 0
   isTransitioning: 1
 --- !u!114 &1061589327
 MonoBehaviour:
@@ -4715,7 +4716,7 @@ MonoBehaviour:
   cameraTopPosition: {x: 0, y: 28, z: 0}
   cameraDoubleTapTransitionSpeed: 1.5
   cameraDefaultFOV: 60
-  singleClick: 0
+  singleClick: 1
 --- !u!1 &1066145258
 GameObject:
   m_ObjectHideFlags: 0

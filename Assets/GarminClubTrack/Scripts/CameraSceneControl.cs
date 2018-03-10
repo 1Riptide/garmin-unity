@@ -25,12 +25,14 @@ public class CameraSceneControl : MonoBehaviour
 	public static bool isCameraToggledDown = false;
 
 	CameraTouchControl touchController;
+	public bool isIntroTransitioning = false;
 	public bool isTransitioning = false;
 	private bool isPuttingSceneReady = false;
 
 	void Awake ()
 	{
 		touchController = GetComponent<CameraTouchControl> ();
+		isIntroTransitioning = true;
 	}
 
 	void Start ()
@@ -113,10 +115,17 @@ public class CameraSceneControl : MonoBehaviour
 		if (defaultScene.Equals (approachScene)){
 			targetTransform = topDownTarget;
 		}
+
+		// Slow it down for intro.
+		var speed = cameraTransitionSpeed;
+		if (isIntroTransitioning) {
+			speed = .2f;
+		}
 		if (Camera.main.transform.position != targetTransform.position || Camera.main.transform.rotation != targetTransform.rotation) {
-			Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, targetTransform.rotation, cameraTransitionSpeed);
-			Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, targetTransform.position, cameraTransitionSpeed);
+			Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, targetTransform.rotation, speed);
+			Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, targetTransform.position, speed);
 		} else {
+			isIntroTransitioning = false;
 			isTransitioning = false;
 		}
 	}
