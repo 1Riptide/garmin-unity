@@ -81,26 +81,34 @@ public class CameraSceneControl : MonoBehaviour
 					}
 					break;
 				case SceneName.PUTTING:
-					if (!isPuttingSceneReady) {
-						if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation) {
-							Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed / 4);
-							Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed / 4);
-						} else {
-							Debug.Log ("Update: Putting Scene READY!");
-							isPuttingSceneReady = true;
-						}
-					} else {
-						// Behave as though transitioning (putts is special, has two transitons)
-						defaultSceneBehavior (target, topDownTarget);
-					}
+					puttingSceneBehavior (target, topDownTarget);
 					break;
 				}
 			} else {
-				// In middle of transition...do this.
-				defaultSceneBehavior (target, topDownTarget);
+				if (defaultScene.Equals (puttingScene)) {
+					puttingSceneBehavior (target, topDownTarget);
+				} else {
+					// In middle of transition...do this.
+					defaultSceneBehavior (target, topDownTarget);
+				}
 			}
 		} else {
 			// No default scene. Sleeping....
+		}
+	}
+
+	void puttingSceneBehavior(Transform target, Transform topDownTarget){
+		if (!isPuttingSceneReady) {
+			if (Camera.main.transform.position != target.position || Camera.main.transform.rotation != target.rotation) {
+				Camera.main.transform.rotation = Quaternion.Lerp (Camera.main.transform.rotation, target.rotation, cameraTransitionSpeed /3);
+				Camera.main.transform.position = Vector3.Lerp (Camera.main.transform.position, target.position, cameraTransitionSpeed / 3);
+			} else {
+				Debug.Log ("Update: Putting Scene READY!");
+				isPuttingSceneReady = true;
+			}
+		} else {
+			// Behave as though transitioning (putts is special, has two transitons)
+			defaultSceneBehavior (target, topDownTarget);
 		}
 	}
 
@@ -119,6 +127,7 @@ public class CameraSceneControl : MonoBehaviour
 		// Slow it down for intro.
 		var speed = cameraTransitionSpeed;
 		if (isIntroTransitioning) {
+			Debug.Log ("isINTRO TRANSITIONING>>>>SLOW!!");
 			speed = .2f;
 		}
 		if (Camera.main.transform.position != targetTransform.position || Camera.main.transform.rotation != targetTransform.rotation) {
@@ -133,13 +142,16 @@ public class CameraSceneControl : MonoBehaviour
 	public void ChangeScene (string sceneName)
 	{
 		Debug.Log ("ChangeScene() called in Unity! sceneName = " + sceneName);
+		// Reset isFocused flag on old scene.
 		if (defaultScene != null) {
 			IGarmin3DChart chartInterface = defaultScene.GetComponent (typeof(IGarmin3DChart)) as IGarmin3DChart;
 			if (chartInterface != null) {
 				chartInterface.isFocused = false;
 			}
 		}
+
 		sceneNameEnum = (SceneName)System.Enum.Parse (typeof(SceneName), sceneName);
+		isIntroTransitioning = false;
 		isTransitioning = true;
 		isPuttingSceneReady = false;
 		switch (sceneNameEnum) {

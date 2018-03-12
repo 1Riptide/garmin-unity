@@ -68,7 +68,7 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		Debug.Log ("playBackgroundTransition()");
 		isInitialized = true;
 		anim.Play ("PlayAnimation");
-		yield return new WaitForSeconds (1.9f);
+		yield return new WaitForSeconds (.9f);
 		if (isFocused) {
 			puttsOverlayEnumerator = StartCoroutine (TogglePuttsOverlay ());
 			if (animatedBall != null) {
@@ -87,7 +87,6 @@ public class PuttingChart : MonoBehaviour, IGarmin3DChart
 		Debug.Log ("reverseBackgroundTransition()");
 		isInitialized = false;
 		puttsOverlay.SetActive (false);
-		//anim ["PlayAnimation"].speed = 0;
 
 		anim.Play ("ReverseAnimation");
 		if (animatedBall != null) {

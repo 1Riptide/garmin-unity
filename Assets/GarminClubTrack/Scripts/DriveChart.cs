@@ -57,7 +57,7 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	public void MockInitialize ()
 	{
 		// This must be called by external platform. Pass JSON.
-		Initialize (getMockJSON());
+		Initialize (getMockJSON ());
 		isFocused = true;
 	}
 
@@ -65,16 +65,13 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 	void Update ()
 	{
 		if (isFocused == true) {
-			Debug.Log ("isFocused");
 			if (avgDistanceMarker.activeSelf.Equals (true)) {
 				avgDistanceMarker.transform.position = Vector3.Lerp (avgDistanceMarker.transform.position, averageShotVector, transitionSpeed * Time.deltaTime);
 			}
 
 			if (minDistanceMarker.activeSelf.Equals (true)) {
-				Debug.Log ("MIN DISTANCE shortestShotVector.z = " + shortestShotVector.z);
 				minDistanceMarker.transform.position = Vector3.Lerp (minDistanceMarker.transform.position, shortestShotVector, transitionSpeed * Time.deltaTime);	
 			}
-
 			maxDistanceMarker.transform.position = Vector3.Lerp (maxDistanceMarker.transform.position, longestShotVector, transitionSpeed * Time.deltaTime);	
 		}
 	}
@@ -159,7 +156,6 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 						distanceRatio = distance / (longestShot);
 						ZPosition = (distanceRatio * zMaxBounds) - negativeZOffset;
 					} else {
-						Debug.Log ("AddDataPoints NOT Tight Range. Shots are not all grouped closely.");
 						/** 
 						 * We need to scale the shots to fit the available vertical space.
 						 * Given this shots distance, we need to calc what percentage of the total range this value represents.
@@ -174,10 +170,10 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 						 * For the inverse, you apply the percentage and apply the offset, so if you are given
 						 * 67.86% on the range [−14,14] you find 67.86%⋅28=19. Then remember to subtract 14 to get back to 5.
 						 */
+
 						distanceRatio = (distance - shortestShot) / (longestShot - shortestShot);
 						ZPosition = (distanceRatio * availableDistanceBounds) - distanceBounds [1];
 
-						Debug.Log ("AddDataPoints : avgShotDistanceOnChart = " + avgShotDistanceOnChart);
 						// Calculate Avg/75th marker
 						if (avgDistanceMarker.activeSelf.Equals (true)) {
 							distanceRatio = (avgShotDistanceOnChart + shortestShot) / (longestShot + shortestShot);
@@ -193,6 +189,8 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 					maxShotZOnChart = ZPosition > maxShotZOnChart ? ZPosition : maxShotZOnChart;
 				
 					Debug.Log ("AddDataPoints : minShotZOnChart = " + minShotZOnChart);
+					Debug.Log ("AddDataPoints : maxShotZOnChart = " + maxShotZOnChart);
+
 	
 					if (minShotZOnChart == bottomOfChartZPosition) {
 						minShotDistanceOnChart = distance;
@@ -219,6 +217,8 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 				float lateralDistance = shotDetail ["dispersionDistance"];
 				float XPosition = 0f;
 				XPosition = lateralDistance / 6;
+
+				Debug.Log ("\tAddDataPoint : distance = " + distance + " lateralDistance = " + lateralDistance);
 		
 				// Here is where your shots goes in 3D Space.
 				Vector3 dataPointPosition = new Vector3 (XPosition, verticalPosition, ZPosition);
@@ -412,153 +412,153 @@ public class DriveChart : MonoBehaviour, IGarmin3DChart
 
 		"\"fairwayShotOutcome\": \"HIT\"\n" +
 		"}," +
-			"{" +
-			"\"shotId\": 64506,\n" +
-			"\"scorecardId\": 17124,\n " +
-			"\"holeNumber\": 2,\n " +
-			"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{" +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -2.58,\n" +
-			"\"shotDistance\": 150,\n" +
+		"\"dispersionDistance\": -2.58,\n" +
+		"\"shotDistance\": 150,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"}," +
-			"{\n " +
-			"\"shotId\": 64506,\n" +
-			"\"scorecardId\": 17124,\n " +
-			"\"holeNumber\": 2,\n " +
-			"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
+		"{\n " +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -160.58,\n" +
-			"\"shotDistance\": 175,\n" +
+		"\"dispersionDistance\": -160.58,\n" +
+		"\"shotDistance\": 175,\n" +
 
-			"\"fairwayShotOutcome\": \"LEFT\"\n" +
-			"}," +
+		"\"fairwayShotOutcome\": \"LEFT\"\n" +
+		"}," +
 
-			"{\n \"shotId\": 64517,\n" +
-			"\"scorecardId\": 17124,\n" +
-			"\"holeNumber\": 6,\n" +
-			"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -45.81,\n" +
-			"\"shotDistance\": 200,\n" +
+		"\"dispersionDistance\": -45.81,\n" +
+		"\"shotDistance\": 200,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"}," +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
 
-			"{\n \"shotId\": 64517,\n" +
-			"\"scorecardId\": 17124,\n" +
-			"\"holeNumber\": 6,\n" +
-			"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": 5.81,\n" +
-			"\"shotDistance\": 225,\n" +
+		"\"dispersionDistance\": 5.81,\n" +
+		"\"shotDistance\": 225,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"},"
-			+
-			"{" +
-			"\"shotId\": 64506,\n" +
-			"\"scorecardId\": 17124,\n " +
-			"\"holeNumber\": 2,\n " +
-			"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"},"
+		+
+		"{" +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -2.58,\n" +
-			"\"shotDistance\": 150,\n" +
+		"\"dispersionDistance\": -2.58,\n" +
+		"\"shotDistance\": 150,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"}," +
-			"{\n " +
-			"\"shotId\": 64506,\n" +
-			"\"scorecardId\": 17124,\n " +
-			"\"holeNumber\": 2,\n " +
-			"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
+		"{\n " +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -160.58,\n" +
-			"\"shotDistance\": 175,\n" +
+		"\"dispersionDistance\": -160.58,\n" +
+		"\"shotDistance\": 175,\n" +
 
-			"\"fairwayShotOutcome\": \"LEFT\"\n" +
-			"}," +
+		"\"fairwayShotOutcome\": \"LEFT\"\n" +
+		"}," +
 
-			"{\n \"shotId\": 64517,\n" +
-			"\"scorecardId\": 17124,\n" +
-			"\"holeNumber\": 6,\n" +
-			"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -45.81,\n" +
-			"\"shotDistance\": 200,\n" +
+		"\"dispersionDistance\": -45.81,\n" +
+		"\"shotDistance\": 200,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"}," +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
 
-			"{\n \"shotId\": 64517,\n" +
-			"\"scorecardId\": 17124,\n" +
-			"\"holeNumber\": 6,\n" +
-			"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": 5.81,\n" +
-			"\"shotDistance\": 225,\n" +
+		"\"dispersionDistance\": 5.81,\n" +
+		"\"shotDistance\": 225,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"},"
-			+
-			"{" +
-			"\"shotId\": 64506,\n" +
-			"\"scorecardId\": 17124,\n " +
-			"\"holeNumber\": 2,\n " +
-			"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"},"
+		+
+		"{" +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -2.58,\n" +
-			"\"shotDistance\": 150,\n" +
+		"\"dispersionDistance\": -2.58,\n" +
+		"\"shotDistance\": 150,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"}," +
-			"{\n " +
-			"\"shotId\": 64506,\n" +
-			"\"scorecardId\": 17124,\n " +
-			"\"holeNumber\": 2,\n " +
-			"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
+		"{\n " +
+		"\"shotId\": 64506,\n" +
+		"\"scorecardId\": 17124,\n " +
+		"\"holeNumber\": 2,\n " +
+		"\"shotTime\": \"2018-01-16T15:58:53.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -160.58,\n" +
-			"\"shotDistance\": 175,\n" +
+		"\"dispersionDistance\": -160.58,\n" +
+		"\"shotDistance\": 175,\n" +
 
-			"\"fairwayShotOutcome\": \"LEFT\"\n" +
-			"}," +
+		"\"fairwayShotOutcome\": \"LEFT\"\n" +
+		"}," +
 
-			"{\n \"shotId\": 64517,\n" +
-			"\"scorecardId\": 17124,\n" +
-			"\"holeNumber\": 6,\n" +
-			"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": -45.81,\n" +
-			"\"shotDistance\": 200,\n" +
+		"\"dispersionDistance\": -45.81,\n" +
+		"\"shotDistance\": 200,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"}," +
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"}," +
 
-			"{\n \"shotId\": 64517,\n" +
-			"\"scorecardId\": 17124,\n" +
-			"\"holeNumber\": 6,\n" +
-			"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
-			"\"clubId\": 0,\n" +
+		"{\n \"shotId\": 64517,\n" +
+		"\"scorecardId\": 17124,\n" +
+		"\"holeNumber\": 6,\n" +
+		"\"shotTime\": \"2018-01-16T16:50:04.000Z\",\n" +
+		"\"clubId\": 0,\n" +
 
-			"\"dispersionDistance\": 5.81,\n" +
-			"\"shotDistance\": 225,\n" +
+		"\"dispersionDistance\": 5.81,\n" +
+		"\"shotDistance\": 225,\n" +
 
-			"\"fairwayShotOutcome\": \"HIT\"\n" +
-			"},"
-			+ "]\n}";
+		"\"fairwayShotOutcome\": \"HIT\"\n" +
+		"},"
+		+ "]\n}";
 	}
 
 	String getMockJSONMin ()
